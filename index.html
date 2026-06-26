@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAMP Platform — Protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f5f3;
+    --surface-0: #f5f5f3;
+    --surface-1: #efefec;
+    --surface-2: #ffffff;
+    --border: rgba(0,0,0,0.1);
+    --border-strong: rgba(0,0,0,0.18);
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c58;
+    --text-muted: #999994;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --accent-text: #1d4ed8;
+    --accent-border: #bfdbfe;
+    --success-bg: #f0fdf4;
+    --success-text: #15803d;
+    --warning-bg: #fffbeb;
+    --warning-text: #b45309;
+    --danger-bg: #fef2f2;
+    --danger-text: #dc2626;
+    --danger-border: #fecaca;
+    --radius: 8px;
+    --font: 'Inter', sans-serif;
+  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text-primary); height: 100vh; overflow: hidden; }
+
+  /* Layout */
+  .app { display: flex; height: 100vh; }
+  .sidebar { width: 220px; min-width: 220px; background: var(--surface-1); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; padding: 0; }
+  .logo-area { padding: 18px 16px 14px; border-bottom: 0.5px solid var(--border); }
+  .logo { font-size: 16px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.3px; }
+  .logo span { color: var(--accent); }
+  .logo-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
+  .nav-label { font-size: 10px; color: var(--text-muted); padding: 10px 8px 4px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 500; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--radius); cursor: pointer; font-size: 13px; color: var(--text-secondary); transition: all 0.1s; user-select: none; margin-bottom: 1px; }
+  .nav-item:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+  .nav-item.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+  .nav-item i { font-size: 16px; min-width: 16px; }
+  .user-area { padding: 12px 14px; border-top: 0.5px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-bg); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--accent-text); min-width: 32px; }
+  .user-name { font-size: 13px; font-weight: 500; }
+  .user-role { font-size: 11px; color: var(--text-muted); }
+
+  /* Main */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { height: 50px; background: var(--surface-2); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 6px; }
+  .topbar-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-right: 8px; }
+  .tab { padding: 5px 12px; border-radius: var(--radius); font-size: 13px; cursor: pointer; color: var(--text-secondary); transition: all 0.1s; }
+  .tab:hover { background: var(--surface-0); }
+  .tab.active { background: var(--surface-0); color: var(--text-primary); font-weight: 500; border: 0.5px solid var(--border); }
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+  .screen { display: none; animation: fadein 0.15s ease; }
+  .screen.active { display: block; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Typography */
+  .page-title { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .page-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .section-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 10px; }
+
+  /* Cards */
+  .card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 16px; }
+  .card-sm { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px; }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; font-size: 11px; padding: 2px 8px; border-radius: var(--radius); font-weight: 500; }
+  .badge-blue { background: var(--accent-bg); color: var(--accent-text); }
+  .badge-green { background: var(--success-bg); color: var(--success-text); }
+  .badge-amber { background: var(--warning-bg); color: var(--warning-text); }
+  .badge-gray { background: var(--surface-1); color: var(--text-muted); border: 0.5px solid var(--border); }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border-strong); background: var(--surface-2); color: var(--text-primary); font-family: var(--font); transition: all 0.1s; }
+  .btn:hover { background: var(--surface-1); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn i { font-size: 15px; }
+
+  /* Progress */
+  .progress-bar { height: 5px; background: var(--surface-1); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+  .progress-fill.green { background: #22c55e; }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+
+  /* Metric card */
+  .metric-card { background: var(--surface-1); border-radius: var(--radius); padding: 14px; }
+  .metric-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .metric-value { font-size: 22px; font-weight: 600; color: var(--text-primary); }
+  .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* HOME */
+  .next-live { background: var(--danger-bg); border: 0.5px solid var(--danger-border); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
+  .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--danger-text); margin-right: 8px; }
+  .live-info p { font-size: 13px; font-weight: 500; color: var(--danger-text); }
+  .live-info span { font-size: 12px; color: var(--danger-text); opacity: 0.75; }
+  .task-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid var(--border); }
+  .task-item:last-child { border-bottom: none; }
+  .task-check { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--border-strong); min-width: 18px; display: flex; align-items: center; justify-content: center; }
+  .task-check.done { background: #22c55e; border-color: #22c55e; }
+  .task-name-text { font-size: 13px; color: var(--text-primary); flex: 1; }
+  .task-name-text.done { color: var(--text-muted); text-decoration: line-through; }
+
+  /* ESTUDO */
+  .module-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+  .module-item:last-child { border-bottom: none; }
+  .module-num { width: 30px; height: 30px; border-radius: var(--radius); background: var(--accent-bg); color: var(--accent-text); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; min-width: 30px; }
+  .module-info { flex: 1; }
+  .module-info p { font-size: 13px; font-weight: 500; }
+  .module-info span { font-size: 11px; color: var(--text-muted); }
+  .file-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border: 0.5px solid var(--border); border-radius: var(--radius); margin-bottom: 6px; }
+  .file-item span { font-size: 13px; flex: 1; }
+
+  /* PROJETOS */
+  .proj-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: border-color 0.15s; }
+  .proj-card:hover { border-color: var(--accent); }
+  .proj-name { font-size: 15px; font-weight: 600; margin: 8px 0 3px; }
+  .proj-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .team-avatars { display: flex; margin-bottom: 10px; }
+  .av-sm { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; border: 2px solid var(--surface-2); margin-left: -6px; }
+  .av-sm:first-child { margin-left: 0; }
+  .info-banner { background: var(--accent-bg); border: 0.5px solid var(--accent-border); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--accent-text); margin-bottom: 16px; }
+
+  /* TASKS POR ÁREA */
+  .area-block { border: 0.5px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+  .area-header { display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: var(--surface-1); cursor: pointer; user-select: none; }
+  .area-icon { width: 28px; height: 28px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 14px; min-width: 28px; }
+  .area-title-text { font-size: 13px; font-weight: 500; flex: 1; }
+  .area-assignee-info { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+  .area-count { font-size: 11px; color: var(--text-muted); margin-left: 12px; }
+  .area-tasks { padding: 0 14px; background: var(--surface-2); max-height: 0; overflow: hidden; transition: max-height 0.2s ease, padding 0.2s; }
+  .area-tasks.open { max-height: 500px; padding: 8px 14px 10px; }
+  .area-task-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+  .area-task-row:last-child { border-bottom: none; }
+  .phase-tag { font-size: 10px; color: var(--text-muted); background: var(--surface-0); padding: 2px 7px; border-radius: var(--radius); white-space: nowrap; }
+  .assign-btn { font-size: 11px; color: var(--accent-text); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+  /* TIME */
+  .member-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; }
+  .member-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; min-width: 38px; }
+  .member-tasks-count { margin-left: auto; text-align: right; }
+  .member-tasks-count p { font-size: 14px; font-weight: 600; }
+  .member-tasks-count span { font-size: 10px; color: var(--text-muted); }
+  .invite-card { background: transparent; border: 1.5px dashed var(--border-strong); border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .invite-card:hover { background: var(--surface-1); }
+
+  /* LIVES */
+  .live-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .live-date { text-align: center; min-width: 44px; }
+  .live-date .month { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+  .live-date .day { font-size: 22px; font-weight: 600; }
+  .live-info-text { flex: 1; }
+  .live-info-text p { font-size: 14px; font-weight: 500; }
+  .live-info-text span { font-size: 12px; color: var(--text-muted); }
+
+  /* MÉTRICAS */
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar-fill { width: 100%; border-radius: 4px 4px 0 0; background: var(--accent); opacity: 0.7; }
+  .bar-label { font-size: 10px; color: var(--text-muted); }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; display: none; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--surface-2); border-radius: 14px; border: 0.5px solid var(--border); padding: 24px; width: 420px; max-width: 95vw; }
+  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+  .field { margin-bottom: 13px; }
+  .field label { font-size: 11px; color: var(--text-secondary); font-weight: 500; display: block; margin-bottom: 5px; }
+  .field input, .field select { width: 100%; padding: 8px 10px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); font-size: 13px; font-family: var(--font); outline: none; }
+  .field input:focus { border-color: var(--accent); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+  .success-banner { background: var(--success-bg); border: 0.5px solid #bbf7d0; border-radius: var(--radius); padding: 10px 12px; font-size: 12px; color: var(--success-text); margin-top: 12px; }
+
+  /* COMUNIDADE */
+  .post-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; }
+  .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo-area">
+      <div class="logo">CAMP <span>●</span></div>
+      <div class="logo-sub">Rise Live — Willian Baldan</div>
+    </div>
+    <div class="nav">
+      <div class="nav-label">Geral</div>
+      <div class="nav-item active" onclick="go('home')"><i class="ti ti-home"></i> Home</div>
+      <div class="nav-item" onclick="go('estudo')"><i class="ti ti-book"></i> Área de estudo</div>
+      <div class="nav-label">Meus lançamentos</div>
+      <div class="nav-item" onclick="go('projetos')"><i class="ti ti-folder"></i> Projetos</div>
+      <div class="nav-item" onclick="go('tasks')"><i class="ti ti-layout-kanban"></i> Tasks — WSPJ</div>
+      <div class="nav-item" onclick="go('time')"><i class="ti ti-users"></i> Time — WSPJ</div>
+      <div class="nav-item" onclick="go('metricas')"><i class="ti ti-chart-bar"></i> Métricas</div>
+      <div class="nav-label">Comunidade</div>
+      <div class="nav-item" onclick="go('lives')"><i class="ti ti-video"></i> Lives & mentorias</div>
+      <div class="nav-item" onclick="go('comunidade')"><i class="ti ti-message-circle"></i> Comunidade</div>
+    </div>
+    <div class="user-area">
+      <div class="avatar">AL</div>
+      <div>
+        <div class="user-name">Aline</div>
+        <div class="user-role">Rise Live · Mentorada</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar" id="topbar">
+      <span class="topbar-title" id="topbar-title">Home</span>
+    </div>
+
+    <div class="content">
+
+      <!-- HOME -->
+      <div class="screen active" id="screen-home">
+        <p class="page-title">Bom dia, Aline 👋</p>
+        <p class="page-sub">Aqui está o resumo do seu dia no CAMP</p>
+        <div class="next-live">
+          <div class="live-info">
+            <p><span class="live-dot"></span>Próxima mentoria: Estratégia de captação</p>
+            <span>Amanhã às 19h · Willian Baldan · Mentoria #4</span>
+          </div>
+          <button class="btn btn-primary"><i class="ti ti-video"></i> Ver detalhes</button>
+        </div>
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="metric-card">
+            <div class="metric-label">Lançamento ativo</div>
+            <div class="metric-value" style="font-size:17px;margin-top:2px">WSPJ</div>
+            <div class="metric-sub">Fase: Inscrições abertas · 28%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Leads captados</div>
+            <div class="metric-value">847</div>
+            <div class="metric-sub"><span class="badge badge-green" style="font-size:10px">+12% hoje</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Tasks pendentes</div>
+            <div class="metric-value">5</div>
+            <div class="metric-sub">de 12 desta semana</div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="section-title" style="margin-bottom:0">Próximas tasks</div>
+            <button class="btn" style="font-size:11px;padding:4px 10px" onclick="go('tasks')">Ver todas</button>
+          </div>
+          <div class="task-item">
+            <div class="task-check done"><i class="ti ti-check" style="font-size:11px;color:white"></i></div>
+            <span class="task-name-text done">Configurar dashboard de tráfego</span>
+            <span class="badge badge-green" style="font-size:10px">Feito</span>
+          </div>
+          <div class="task-item">
+            <div class="task-check"></div>
+            <span class="task-name-text">Publicar anúncios e monitorar métricas iniciais</span>
+            <span class="badge badge-amber" style="font-size:10px">Tráfego</span>
+          </div>
+          <div class="task-item">
+            <div class="task-check"></div>
+            <span class="task-name-text">Atualizar tags e listas no ManyChat para inscrições</span>
+            <span class="badge badge-blue" style="font-size:10px">Automação</span>
+          </div>
+          <div class="task-item">
+            <div class="task-check"></div>
+            <span class="task-name-text">Produzir conteúdos de ativação — semana do evento</span>
+            <span class="badge badge-gray" style="font-size:10px">Conteúdo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTUDO -->
+      <div class="screen" id="screen-estudo">
+        <p class="page-title">Área de estudo</p>
+        <p class="page-sub">Módulos da metodologia Rise · aprenda e execute no mesmo lugar</p>
+        <div class="info-banner"><i class="ti ti-bulb"></i> &nbsp;Você está na fase de <strong>Inscrições abertas</strong> no WSPJ. As aulas do Módulo 2 são as mais relevantes para agora.</div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="section-title">Módulos do curso</div>
+          <div class="module-item">
+            <div class="module-num">1</div>
+            <div class="module-info"><p>Fundamentos do lançamento pago</p><span>8 aulas · 2h30</span></div>
+            <div style="text-align:right">
+              <div class="progress-bar" style="width:80px;margin-bottom:3px"><div class="progress-fill green" style="width:100%"></div></div>
+              <span style="font-size:11px;color:#15803d">Completo</span>
+            </div>
+          </div>
+          <div class="module-item" style="border:1.5px solid var(--accent);border-radius:var(--radius);padding:10px;margin:-2px 0 2px">
+            <div class="module-num">2</div>
+            <div class="module-info"><p>Estratégia de captação <span class="badge badge-blue" style="font-size:10px;margin-left:6px">Agora</span></p><span>12 aulas · 4h15</span></div>
+            <div style="text-align:right">
+              <div class="progress-bar" style="width:80px;margin-bottom:3px"><div class="progress-fill" style="width:60%"></div></div>
+              <span style="font-size:11px;color:var(--text-muted)">60%</span>
+            </div>
+          </div>
+          <div class="module-item">
+            <div class="module-num" style="background:var(--surface-1);color:var(--text-muted)">3</div>
+            <div class="module-info"><p style="color:var(--text-muted)">Aquecimento e pré-lançamento</p><span>10 aulas · 3h40</span></div>
+            <span class="badge badge-gray">Bloqueado</span>
+          </div>
+          <div class="module-item">
+            <div class="module-num" style="background:var(--surface-1);color:var(--text-muted)">4</div>
+            <div class="module-info"><p style="color:var(--text-muted)">Abertura e gestão do carrinho</p><span>9 aulas · 3h10</span></div>
+            <span class="badge badge-gray">Bloqueado</span>
+          </div>
+          <div class="module-item">
+            <div class="module-num" style="background:var(--surface-1);color:var(--text-muted)">5</div>
+            <div class="module-info"><p style="color:var(--text-muted)">Pós-venda e encerramento</p><span>6 aulas · 2h00</span></div>
+            <span class="badge badge-gray">Bloqueado</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Materiais e templates</div>
+          <div class="file-item"><i class="ti ti-file-spreadsheet" style="font-size:16px;color:var(--accent)"></i><span>Planilha de métricas do lançamento</span><button class="btn" style="font-size:11px;padding:4px 8px"><i class="ti ti-download"></i></button></div>
+          <div class="file-item"><i class="ti ti-file-text" style="font-size:16px;color:var(--accent)"></i><span>Script de lives de captação</span><button class="btn" style="font-size:11px;padding:4px 8px"><i class="ti ti-download"></i></button></div>
+          <div class="file-item"><i class="ti ti-file-text" style="font-size:16px;color:var(--accent)"></i><span>Cronograma modelo de lançamento pago</span><button class="btn" style="font-size:11px;padding:4px 8px"><i class="ti ti-download"></i></button></div>
+          <div class="file-item"><i class="ti ti-file-text" style="font-size:16px;color:var(--accent)"></i><span>Template de e-mails de vendas</span><button class="btn" style="font-size:11px;padding:4px 8px"><i class="ti ti-download"></i></button></div>
+        </div>
+      </div>
+
+      <!-- PROJETOS -->
+      <div class="screen" id="screen-projetos">
+        <div class="row">
+          <div><p class="page-title">Meus projetos</p><p class="page-sub">Cada lançamento tem seu próprio time e tasks</p></div>
+          <button class="btn btn-primary" onclick="document.getElementById('modal-novo').classList.add('open')"><i class="ti ti-plus"></i> Novo lançamento</button>
+        </div>
+        <div class="info-banner" style="margin-bottom:16px"><i class="ti ti-info-circle"></i> &nbsp;Ao criar um novo lançamento, todas as tasks da metodologia Rise são geradas automaticamente. Você só precisa atribuir cada área ao seu time.</div>
+        <div class="grid-2">
+          <div class="proj-card" style="border-color:var(--accent)" onclick="go('tasks')">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span class="badge badge-blue">Ativo</span><span style="font-size:10px;color:var(--text-muted)">Lançamento #2</span></div>
+            <p class="proj-name">WSPJ</p>
+            <p class="proj-meta">Workshop São Paulo Jr · Meta R$ 200k · Abertura 15 jul</p>
+            <div class="team-avatars">
+              <div class="av-sm" style="background:var(--accent-bg);color:var(--accent-text)">JO</div>
+              <div class="av-sm" style="background:var(--success-bg);color:var(--success-text)">MA</div>
+              <div class="av-sm" style="background:var(--warning-bg);color:var(--warning-text)">PE</div>
+              <div class="av-sm" style="background:var(--surface-1);color:var(--text-muted);border:2px solid var(--surface-2)">+4</div>
+            </div>
+            <div class="progress-bar" style="margin-bottom:5px"><div class="progress-fill" style="width:28%"></div></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--text-muted)">Inscrições abertas</span><span style="font-size:11px;color:var(--text-muted)">28%</span></div>
+          </div>
+          <div class="proj-card" onclick="go('tasks')">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span class="badge badge-gray">Finalizado</span><span style="font-size:10px;color:var(--text-muted)">Lançamento #1</span></div>
+            <p class="proj-name">Rise Fit — Ed.1</p>
+            <p class="proj-meta">Nicho fitness · Faturado R$ 89k · Jun 2025</p>
+            <div class="team-avatars">
+              <div class="av-sm" style="background:var(--accent-bg);color:var(--accent-text)">JO</div>
+              <div class="av-sm" style="background:var(--success-bg);color:var(--success-text)">CA</div>
+            </div>
+            <div class="progress-bar" style="margin-bottom:5px"><div class="progress-fill green" style="width:100%"></div></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:#15803d">Concluído</span><span style="font-size:11px;color:#15803d">100%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="screen" id="screen-tasks">
+        <div class="row">
+          <div><p class="page-title">WSPJ — Tasks por área</p><p class="page-sub">Template da metodologia Rise · 68 tasks · 7 áreas</p></div>
+          <div style="display:flex;gap:6px">
+            <select style="font-size:12px;padding:6px 10px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:var(--surface-2);color:var(--text-primary);font-family:var(--font)"><option>Todas as fases</option><option>Inscrições abertas</option><option>Evento</option><option>Carrinho aberto</option><option>Semana s+1</option><option>Encerramento</option></select>
+            <button class="btn" onclick="go('time')"><i class="ti ti-users"></i> Ver time</button>
+          </div>
+        </div>
+
+        <div id="areas-list">
+          <div class="area-block">
+            <div class="area-header" onclick="toggleArea('trafego')">
+              <div class="area-icon" style="background:#fef2f2"><i class="ti ti-speakerphone" style="color:#dc2626"></i></div>
+              <span class="area-title-text">Tráfego</span>
+              <div class="area-assignee-info"><div class="av-sm" style="background:var(--accent-bg);color:var(--accent-text);margin-left:0;border:none">JO</div>João Silva</div>
+              <span class="area-count">2/8 feitas</span>
+              <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted);margin-left:8px"></i>
+            </div>
+            <div class="area-tasks open" id="at-trafego">
+              <div class="area-task-row"><div class="task-check done"><i class="ti ti-check" style="font-size:10px;color:white"></i></div><span class="task-name-text done" style="font-size:12px">Configurar dashboard de acompanhamento de tráfego</span><span class="phase-tag">Inscrições</span></div>
+              <div class="area-task-row"><div class="task-check done"><i class="ti ti-check" style="font-size:10px;color:white"></i></div><span class="task-name-text done" style="font-size:12px">Subir campanhas com criativos de captação</span><span class="phase-tag">Inscrições</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Publicar anúncios e monitorar métricas iniciais</span><span class="phase-tag">Inscrições</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Subir campanhas de tráfego com criativos de venda</span><span class="phase-tag">Carrinho</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Subir campanhas para ação de boleto parcelado</span><span class="phase-tag">Carrinho</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Otimizar orçamentos e públicos das campanhas</span><span class="phase-tag">Semana s+1</span></div>
+            </div>
+          </div>
+
+          <div class="area-block">
+            <div class="area-header" onclick="toggleArea('conteudo')">
+              <div class="area-icon" style="background:#f0fdf4"><i class="ti ti-writing" style="color:#15803d"></i></div>
+              <span class="area-title-text">Conteúdo & Ativação</span>
+              <div class="area-assignee-info"><div class="av-sm" style="background:var(--success-bg);color:var(--success-text);margin-left:0;border:none">MA</div>Maria Souza</div>
+              <span class="area-count">0/12 feitas</span>
+              <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted);margin-left:8px"></i>
+            </div>
+            <div class="area-tasks" id="at-conteudo">
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Receber briefing de temas, formatos e prazos</span><span class="phase-tag">Evento</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Produzir conteúdos de ativação (copy, áudio e vídeo)</span><span class="phase-tag">Evento</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Revisar conteúdos e entregar para disparo — semana s+1</span><span class="phase-tag">Semana s+1</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Redigir copies para e-mail, WhatsApp e push</span><span class="phase-tag">Carrinho</span></div>
+            </div>
+          </div>
+
+          <div class="area-block">
+            <div class="area-header" onclick="toggleArea('design')">
+              <div class="area-icon" style="background:#faf5ff"><i class="ti ti-palette" style="color:#7c3aed"></i></div>
+              <span class="area-title-text">Design & Criativos</span>
+              <div class="area-assignee-info"><div class="av-sm" style="background:var(--warning-bg);color:var(--warning-text);margin-left:0;border:none">PE</div>Pedro Costa</div>
+              <span class="area-count">0/9 feitas</span>
+              <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted);margin-left:8px"></i>
+            </div>
+            <div class="area-tasks" id="at-design">
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Receber briefing criativo: copy, identidade visual e formatos</span><span class="phase-tag">Carrinho</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Produzir criativos visuais de imagem de venda</span><span class="phase-tag">Carrinho</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Produzir criativos de escassez e contagem regressiva</span><span class="phase-tag">Carrinho</span></div>
+            </div>
+          </div>
+
+          <div class="area-block">
+            <div class="area-header" onclick="toggleArea('automacao')">
+              <div class="area-icon" style="background:var(--warning-bg)"><i class="ti ti-robot" style="color:var(--warning-text)"></i></div>
+              <span class="area-title-text">Automação</span>
+              <div class="area-assignee-info assign-btn"><i class="ti ti-plus" style="font-size:12px"></i>Atribuir membro</div>
+              <span class="area-count">0/7 feitas</span>
+              <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted);margin-left:8px"></i>
+            </div>
+            <div class="area-tasks" id="at-automacao">
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Atualizar tags e listas no ManyChat/Unni para inscrições</span><span class="phase-tag">Inscrições</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Configurar automações e agendar disparos para o evento</span><span class="phase-tag">Evento</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Validar automações e segmentações — semana s+1</span><span class="phase-tag">Semana s+1</span></div>
+            </div>
+          </div>
+
+          <div class="area-block">
+            <div class="area-header" onclick="toggleArea('web')">
+              <div class="area-icon" style="background:var(--accent-bg)"><i class="ti ti-code" style="color:var(--accent-text)"></i></div>
+              <span class="area-title-text">Web & Dev</span>
+              <div class="area-assignee-info assign-btn"><i class="ti ti-plus" style="font-size:12px"></i>Atribuir membro</div>
+              <span class="area-count">0/6 feitas</span>
+              <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted);margin-left:8px"></i>
+            </div>
+            <div class="area-tasks" id="at-web">
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Atualizar página de vendas para lista de espera</span><span class="phase-tag">Encerramento</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Desenvolver layout da seção de boleto parcelado</span><span class="phase-tag">Carrinho</span></div>
+            </div>
+          </div>
+
+          <div class="area-block">
+            <div class="area-header" onclick="toggleArea('estrategia')">
+              <div class="area-icon" style="background:var(--success-bg)"><i class="ti ti-chart-line" style="color:var(--success-text)"></i></div>
+              <span class="area-title-text">Estratégia & KPIs</span>
+              <div class="area-assignee-info"><div class="av-sm" style="background:var(--accent-bg);color:var(--accent-text);margin-left:0;border:none">AL</div>Aline (você)</div>
+              <span class="area-count">1/10 feitas</span>
+              <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted);margin-left:8px"></i>
+            </div>
+            <div class="area-tasks" id="at-estrategia">
+              <div class="area-task-row"><div class="task-check done"><i class="ti ti-check" style="font-size:10px;color:white"></i></div><span class="task-name-text done" style="font-size:12px">Reunião de alinhamento com o time</span><span class="phase-tag">Inscrições</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Consolidar relatório de vendas e faturamento parcial</span><span class="phase-tag">Carrinho</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Fechamento dos indicadores — KPIs</span><span class="phase-tag">Encerramento</span></div>
+            </div>
+          </div>
+
+          <div class="area-block">
+            <div class="area-header" onclick="toggleArea('atendimento')">
+              <div class="area-icon" style="background:var(--surface-1)"><i class="ti ti-headset" style="color:var(--text-secondary)"></i></div>
+              <span class="area-title-text">Atendimento</span>
+              <div class="area-assignee-info assign-btn"><i class="ti ti-plus" style="font-size:12px"></i>Atribuir membro</div>
+              <span class="area-count">0/5 feitas</span>
+              <i class="ti ti-chevron-down" style="font-size:14px;color:var(--text-muted);margin-left:8px"></i>
+            </div>
+            <div class="area-tasks" id="at-atendimento">
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Definir escala, canais e responsáveis por turno</span><span class="phase-tag">Carrinho</span></div>
+              <div class="area-task-row"><div class="task-check"></div><span class="task-name-text" style="font-size:12px">Monitorar qualidade do atendimento — semana s+1</span><span class="phase-tag">Semana s+1</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIME -->
+      <div class="screen" id="screen-time">
+        <div class="row">
+          <div><p class="page-title">WSPJ — Time do lançamento</p><p class="page-sub">Gerencie quem está em cada área do projeto</p></div>
+          <button class="btn btn-primary"><i class="ti ti-user-plus"></i> Convidar membro</button>
+        </div>
+        <div class="grid-2" style="margin-bottom:10px">
+          <div class="member-card">
+            <div class="member-av" style="background:var(--accent-bg);color:var(--accent-text)">JO</div>
+            <div><p style="font-size:13px;font-weight:500">João Silva</p><p style="font-size:11px;color:var(--text-muted)">Tráfego</p></div>
+            <div class="member-tasks-count"><p>2/8</p><span>tasks</span></div>
+          </div>
+          <div class="member-card">
+            <div class="member-av" style="background:var(--success-bg);color:var(--success-text)">MA</div>
+            <div><p style="font-size:13px;font-weight:500">Maria Souza</p><p style="font-size:11px;color:var(--text-muted)">Conteúdo & Ativação</p></div>
+            <div class="member-tasks-count"><p>0/12</p><span>tasks</span></div>
+          </div>
+          <div class="member-card">
+            <div class="member-av" style="background:var(--warning-bg);color:var(--warning-text)">PE</div>
+            <div><p style="font-size:13px;font-weight:500">Pedro Costa</p><p style="font-size:11px;color:var(--text-muted)">Design & Criativos</p></div>
+            <div class="member-tasks-count"><p>0/9</p><span>tasks</span></div>
+          </div>
+          <div class="member-card">
+            <div class="member-av" style="background:var(--accent-bg);color:var(--accent-text)">AL</div>
+            <div><p style="font-size:13px;font-weight:500">Aline (você)</p><p style="font-size:11px;color:var(--text-muted)">Estratégia & KPIs</p></div>
+            <div class="member-tasks-count"><p>1/10</p><span>tasks</span></div>
+          </div>
+        </div>
+        <div class="invite-card" style="margin-bottom:12px">
+          <div style="width:38px;height:38px;border-radius:50%;border:1.5px dashed var(--border-strong);display:flex;align-items:center;justify-content:center;min-width:38px"><i class="ti ti-plus" style="font-size:16px;color:var(--text-muted)"></i></div>
+          <div><p style="font-size:13px;color:var(--text-secondary);font-weight:500">Convidar membro</p><p style="font-size:11px;color:var(--text-muted)">3 áreas sem responsável: Automação, Web & Dev, Atendimento</p></div>
+        </div>
+        <div class="card" style="background:var(--accent-bg);border-color:var(--accent-border)">
+          <p style="font-size:12px;color:var(--accent-text)"><i class="ti ti-eye"></i> &nbsp;Cada membro vê <strong>apenas as tasks da área dele</strong>. Como mentorada, você e a equipe Orbyka veem o projeto completo.</p>
+        </div>
+      </div>
+
+      <!-- MÉTRICAS -->
+      <div class="screen" id="screen-metricas">
+        <p class="page-title">Métricas do lançamento</p>
+        <p class="page-sub">WSPJ — acompanhe os números em tempo real</p>
+        <div class="grid-3" style="margin-bottom:14px">
+          <div class="metric-card"><div class="metric-label">Leads captados</div><div class="metric-value">847</div><div class="metric-sub"><span class="badge badge-green" style="font-size:10px">+12% semana</span></div></div>
+          <div class="metric-card"><div class="metric-label">Taxa de conversão</div><div class="metric-value">4,2%</div><div class="metric-sub">Meta: 5%</div></div>
+          <div class="metric-card"><div class="metric-label">Faturamento previsto</div><div class="metric-value">R$127k</div><div class="metric-sub"><span class="badge badge-amber" style="font-size:10px">Em andamento</span></div></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Leads por dia (esta semana)</div>
+          <div class="bar-chart">
+            <div class="bar-col"><div class="bar-fill" style="height:30%"></div><span class="bar-label">Seg</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height:50%"></div><span class="bar-label">Ter</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height:45%"></div><span class="bar-label">Qua</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height:70%"></div><span class="bar-label">Qui</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height:90%"></div><span class="bar-label">Sex</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height:60%"></div><span class="bar-label">Sáb</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height:40%"></div><span class="bar-label">Dom</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVES -->
+      <div class="screen" id="screen-lives">
+        <p class="page-title">Lives & mentorias</p>
+        <p class="page-sub">Agenda das 12 mentorias em grupo do Rise Live</p>
+        <div class="live-card" style="border-color:var(--accent)">
+          <div class="live-date"><div class="month">JUL</div><div class="day">03</div></div>
+          <div class="live-info-text"><p>Mentoria #4 — Estratégia de captação</p><span>19h00 · Willian Baldan · Zoom</span></div>
+          <button class="btn btn-primary"><i class="ti ti-video"></i> Acessar</button>
+        </div>
+        <div class="live-card">
+          <div class="live-date"><div class="month">JUL</div><div class="day">17</div></div>
+          <div class="live-info-text"><p>Mentoria #5 — Análise de lançamentos ao vivo</p><span>19h00 · Willian Baldan · Zoom</span></div>
+          <button class="btn">Ver detalhes</button>
+        </div>
+        <div class="live-card" style="opacity:0.6">
+          <div class="live-date"><div class="month">AGO</div><div class="day">07</div></div>
+          <div class="live-info-text"><p>Mentoria #6 — Aquecimento e copy</p><span>19h00 · Willian Baldan · Zoom</span></div>
+          <button class="btn">Ver detalhes</button>
+        </div>
+        <div style="margin-top:20px">
+          <div class="section-title">Gravações anteriores</div>
+          <div class="module-item"><div class="module-num" style="background:var(--surface-1);color:var(--text-muted)"><i class="ti ti-player-play" style="font-size:12px"></i></div><div class="module-info"><p>Mentoria #1 — Fundamentos do lançamento pago</p><span>Jun 05 · 1h42</span></div><button class="btn" style="font-size:11px;padding:4px 10px">Assistir</button></div>
+          <div class="module-item"><div class="module-num" style="background:var(--surface-1);color:var(--text-muted)"><i class="ti ti-player-play" style="font-size:12px"></i></div><div class="module-info"><p>Mentoria #2 — Brainstorming de ofertas</p><span>Jun 19 · 2h05</span></div><button class="btn" style="font-size:11px;padding:4px 10px">Assistir</button></div>
+          <div class="module-item"><div class="module-num" style="background:var(--surface-1);color:var(--text-muted)"><i class="ti ti-player-play" style="font-size:12px"></i></div><div class="module-info"><p>Mentoria #3 — Planejamento do lançamento</p><span>Jun 26 · 1h58</span></div><button class="btn" style="font-size:11px;padding:4px 10px">Assistir</button></div>
+        </div>
+      </div>
+
+      <!-- COMUNIDADE -->
+      <div class="screen" id="screen-comunidade">
+        <p class="page-title">Comunidade Rise</p>
+        <p class="page-sub">Resultados e atualizações dos membros</p>
+        <div class="post-card">
+          <div class="post-header">
+            <div class="avatar" style="width:36px;height:36px;font-size:12px">WB</div>
+            <div style="flex:1"><p style="font-size:13px;font-weight:500">Willian Baldan</p><p style="font-size:11px;color:var(--text-muted)">há 3 horas · Atualização</p></div>
+            <span class="badge badge-blue">Orbyka</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-primary)">Galera, próxima mentoria será focada em estratégias de captação que estão funcionando no momento. Preparem suas dúvidas e cases!</p>
+        </div>
+        <div class="post-card">
+          <div class="post-header">
+            <div class="avatar" style="width:36px;height:36px;font-size:12px;background:var(--success-bg);color:var(--success-text)">MR</div>
+            <div style="flex:1"><p style="font-size:13px;font-weight:500">Marcos Ribeiro</p><p style="font-size:11px;color:var(--text-muted)">há 5 horas</p></div>
+            <span class="badge badge-green">Resultado</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-primary)">Fechei o carrinho com R$112k! Metodologia do Willian funcionou demais. Obrigado a todos da comunidade pelo apoio! 🚀</p>
+        </div>
+        <div class="post-card">
+          <div class="post-header">
+            <div class="avatar" style="width:36px;height:36px;font-size:12px;background:var(--warning-bg);color:var(--warning-text)">FS</div>
+            <div style="flex:1"><p style="font-size:13px;font-weight:500">Fernanda Silva</p><p style="font-size:11px;color:var(--text-muted)">ontem</p></div>
+            <span class="badge badge-amber">Dúvida</span>
+          </div>
+          <p style="font-size:13px;color:var(--text-primary)">Alguém tem dica para aumentar a taxa de abertura dos e-mails na fase de aquecimento? Minha taxa está em 18%.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO PROJETO -->
+<div class="modal-overlay" id="modal-novo" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box">
+    <p class="modal-title">Criar novo lançamento</p>
+    <div class="field"><label>Nome do lançamento</label><input type="text" placeholder="Ex: WSPJ, Rise Fit Ed.2..."></div>
+    <div class="field"><label>Produto / nicho</label><input type="text" placeholder="Ex: Workshop São Paulo Jr"></div>
+    <div class="field-row">
+      <div class="field"><label>Data de abertura</label><input type="date"></div>
+      <div class="field"><label>Meta de faturamento</label><input type="text" placeholder="R$ 0,00"></div>
+    </div>
+    <div class="success-banner"><i class="ti ti-check"></i> &nbsp;Todas as tasks da metodologia Rise serão criadas automaticamente. Você precisará apenas atribuir cada área ao seu time.</div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal-novo').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="document.getElementById('modal-novo').classList.remove('open');go('tasks')"><i class="ti ti-rocket"></i> Criar projeto</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const titles = { home:'Home', estudo:'Área de estudo', projetos:'Projetos', tasks:'WSPJ — Tasks', time:'WSPJ — Time', metricas:'Métricas', lives:'Lives & mentorias', comunidade:'Comunidade' };
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.getElementById('topbar-title').textContent = titles[id] || id;
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) n.classList.add('active');
+  });
+  window.scrollTo && document.querySelector('.content').scrollTo(0,0);
+}
+function toggleArea(id) {
+  const el = document.getElementById('at-' + id);
+  el.classList.toggle('open');
+}
+</script>
+</body>
+</html>
