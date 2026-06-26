@@ -618,15 +618,46 @@
 
 <!-- MODAL NOVO PROJETO -->
 <div class="modal-overlay" id="modal-novo" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal-box">
+  <div class="modal-box" style="width:500px">
     <p class="modal-title">Criar novo lançamento</p>
-    <div class="field"><label>Nome do lançamento</label><input type="text" placeholder="Ex: WSPJ, Rise Fit Ed.2..."></div>
-    <div class="field"><label>Produto / nicho</label><input type="text" placeholder="Ex: Workshop São Paulo Jr"></div>
+
     <div class="field-row">
-      <div class="field"><label>Data de abertura</label><input type="date"></div>
+      <div class="field"><label>Nome do lançamento</label><input type="text" placeholder="Ex: WSPJ, Rise Fit Ed.2..."></div>
       <div class="field"><label>Meta de faturamento</label><input type="text" placeholder="R$ 0,00"></div>
     </div>
-    <div class="success-banner"><i class="ti ti-check"></i> &nbsp;Todas as tasks da metodologia Rise serão criadas automaticamente. Você precisará apenas atribuir cada área ao seu time.</div>
+    <div class="field"><label>Produto / nicho</label><input type="text" placeholder="Ex: Workshop São Paulo Jr"></div>
+
+    <div style="border-top:0.5px solid var(--border);margin:14px 0 12px;padding-top:14px">
+      <p style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:10px"><i class="ti ti-calendar-event" style="font-size:14px;vertical-align:-2px"></i> &nbsp;Datas principais — os sprints serão organizados automaticamente</p>
+      <div class="field-row">
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#7c3aed;display:inline-block"></span> Início da produção</label>
+          <input type="date" id="d-producao" oninput="calcDates()">
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#2563eb;display:inline-block"></span> Início da captação</label>
+          <input type="date" id="d-captacao" oninput="calcDates()">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block"></span> Data do workshop</label>
+          <input type="date" id="d-workshop" oninput="calcDates()">
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#dc2626;display:inline-block"></span> Fechamento do carrinho</label>
+          <input type="date" id="d-carrinho" oninput="calcDates()">
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVIEW DOS SPRINTS -->
+    <div id="sprints-preview" style="display:none;background:var(--surface-1);border-radius:var(--radius);padding:12px;margin-bottom:12px">
+      <p style="font-size:11px;font-weight:500;color:var(--text-secondary);margin-bottom:8px">Sprints gerados automaticamente</p>
+      <div id="sprints-list" style="display:flex;flex-direction:column;gap:5px"></div>
+    </div>
+
+    <div class="success-banner"><i class="ti ti-check"></i> &nbsp;Todas as tasks da metodologia Rise serão criadas e distribuídas nos sprints conforme as datas informadas.</div>
     <div class="modal-footer">
       <button class="btn" onclick="document.getElementById('modal-novo').classList.remove('open')">Cancelar</button>
       <button class="btn btn-primary" onclick="document.getElementById('modal-novo').classList.remove('open');go('tasks')"><i class="ti ti-rocket"></i> Criar projeto</button>
@@ -649,6 +680,43 @@ function go(id) {
 function toggleArea(id) {
   const el = document.getElementById('at-' + id);
   el.classList.toggle('open');
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' });
+}
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+
+function calcDates() {
+  const vP = document.getElementById('d-producao').value;
+  const vC = document.getElementById('d-captacao').value;
+  const vW = document.getElementById('d-workshop').value;
+  const vF = document.getElementById('d-carrinho').value;
+  if (!vP && !vC && !vW && !vF) { document.getElementById('sprints-preview').style.display='none'; return; }
+
+  const dP = vP ? new Date(vP+'T12:00:00') : null;
+  const dC = vC ? new Date(vC+'T12:00:00') : null;
+  const dW = vW ? new Date(vW+'T12:00:00') : null;
+  const dF = vF ? new Date(vF+'T12:00:00') : null;
+
+  const sprints = [
+    { color:'#7c3aed', label:'Produção', de: dP, ate: dC ? addDays(dC,-1) : null },
+    { color:'#2563eb', label:'Captação', de: dC, ate: dW ? addDays(dW,-1) : null },
+    { color:'#f59e0b', label:'Workshop', de: dW, ate: dW ? addDays(dW, 1) : null },
+    { color:'#ea580c', label:'Carrinho aberto', de: dW ? addDays(dW,2) : null, ate: dF },
+    { color:'#dc2626', label:'Fechamento', de: dF, ate: dF ? addDays(dF,1) : null },
+    { color:'#64748b', label:'Pós-lançamento', de: dF ? addDays(dF,2) : null, ate: dF ? addDays(dF,21) : null },
+  ];
+
+  const list = document.getElementById('sprints-list');
+  list.innerHTML = sprints.map(s => `
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="width:9px;height:9px;border-radius:50%;background:${s.color};min-width:9px;display:inline-block"></span>
+      <span style="font-size:12px;font-weight:500;color:#1a1a18;min-width:130px">${s.label}</span>
+      <span style="font-size:11px;color:#999994">${fmtDate(s.de)} → ${fmtDate(s.ate)}</span>
+    </div>`).join('');
+  document.getElementById('sprints-preview').style.display = 'block';
 }
 </script>
 </body>
