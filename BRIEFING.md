@@ -30,17 +30,35 @@
 > Onde o membro trabalha
 
 **Gestão de Lançamentos (estilo ClickUp):**
-- Cria um novo lançamento como um projeto
+- Cria um novo lançamento como um projeto (ex: WSPJ, Rise Fit)
 - Define: nome do produto, nicho, público, data do lançamento, meta de faturamento
-- A plataforma gera automaticamente o plano de execução baseado na metodologia Rise
+- A plataforma popula automaticamente todas as tasks do template da metodologia Rise, organizadas por área
+- O mentorado atribui cada área ao membro do seu próprio time
 
-**Kanban do Lançamento:**
+**Fases do Lançamento (baseado no template da Orbyka):**
 ```
-[ Planejamento ] → [ Captação ] → [ Aquecimento ] → [ Abertura ] → [ Carrinho ] → [ Pós-venda ]
+[ Inscrições abertas ] → [ Evento ] → [ Carrinho aberto ] → [ Semana s+1 ] → [ Semana s+2 ] → [ Semana s+3 ] → [ Encerramento ] → [ Pós-lançamento ]
 ```
-- Cada coluna tem tarefas específicas da metodologia
-- Tarefas com checklists validados pelo Willian
-- Prazo e responsável por tarefa
+
+**Áreas de trabalho (template de tasks por área):**
+| Área | Responsabilidade |
+|---|---|
+| Tráfego | Campanhas, anúncios, otimização de orçamento |
+| Conteúdo & Ativação | Copies, áudio, vídeo, conteúdos por canal |
+| Design & Criativos | Criativos visuais, layouts, imagens |
+| Automação | ManyChat, Unni, ActiveCampaign, tags e listas |
+| Edição de Vídeo | Edição de aulas, UGCs, criativos em vídeo |
+| Web & Dev | Páginas de vendas, plataforma, dashboards |
+| Estratégia & Comercial | KPIs, relatórios, análises, briefings |
+| Atendimento | Escala de suporte, cobertura nos canais |
+| Gestão de Projetos | Alinhamentos, certificados, acessos, retrospectivas |
+
+> **Importante:** As áreas são o template fixo da metodologia. Os membros do time são os que o próprio mentorado cadastra e atribui — cada lançamento pode ter um time diferente.
+
+**Visibilidade por perfil:**
+- **Membro do time** → vê apenas as tasks da área atribuída a ele
+- **Mentorado** → vê o projeto completo com todas as áreas
+- **Willian + Head de Projetos da Orbyka** → veem todos os projetos de todos os mentorados
 
 **Dentro de cada Lançamento:**
 - Calendário de datas e deadlines
