@@ -627,6 +627,66 @@
     </div>
     <div class="field"><label>Produto / nicho</label><input type="text" placeholder="Ex: Workshop São Paulo Jr"></div>
 
+    <!-- PLANEJAMENTO ESTRATÉGICO -->
+    <div style="border-top:0.5px solid var(--border);margin:14px 0 12px;padding-top:14px">
+      <p style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:10px"><i class="ti ti-target" style="font-size:14px;vertical-align:-2px"></i> &nbsp;Planejamento estratégico</p>
+
+      <!-- INGRESSOS -->
+      <p style="font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px">Ingressos / Captação</p>
+      <div class="field-row">
+        <div class="field"><label>Meta de ingressos</label><input type="number" placeholder="Ex: 5000" id="s-ingressos" oninput="calcMetas()"></div>
+        <div class="field"><label>Ticket médio</label><input type="text" placeholder="R$ 0,00" id="s-ticket-ingresso" oninput="calcMetas()"></div>
+      </div>
+
+      <!-- PRODUTO PRINCIPAL -->
+      <p style="font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;margin-top:4px;text-transform:uppercase;letter-spacing:0.4px">Produto principal</p>
+      <div class="field-row">
+        <div class="field"><label>Ticket oferta</label><input type="text" placeholder="R$ 1.797,00" id="s-ticket-prod"></div>
+        <div class="field"><label>Ticket médio esperado</label><input type="text" placeholder="R$ 1.200,00" id="s-ticket-medio" oninput="calcMetas()"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Conversão esperada (%)</label><input type="number" placeholder="Ex: 14" id="s-conversao" oninput="calcMetas()"></div>
+        <div class="field"><label>Verba de tráfego</label><input type="text" placeholder="R$ 0,00" id="s-verba"></div>
+      </div>
+
+      <!-- ORDERBUMP -->
+      <p style="font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;margin-top:4px;text-transform:uppercase;letter-spacing:0.4px">Orderbump principal</p>
+      <div class="field-row">
+        <div class="field"><label>Produto orderbump</label><input type="text" placeholder="Ex: Curso em formato de aulas"></div>
+        <div class="field"><label>Ticket · Conversão esperada</label>
+          <div style="display:flex;gap:6px"><input type="text" placeholder="R$ 197,00" style="width:50%"><input type="number" placeholder="22%" style="width:50%"></div>
+        </div>
+      </div>
+
+      <!-- SIMULAÇÃO DE TRÁFEGO -->
+      <p style="font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;margin-top:4px;text-transform:uppercase;letter-spacing:0.4px">Simulação de tráfego</p>
+      <div class="field-row">
+        <div class="field"><label>CPM estimado</label><input type="text" placeholder="R$ 28,00" id="s-cpm" oninput="calcMetas()"></div>
+        <div class="field"><label>CTR estimado (%)</label><input type="number" placeholder="0,95" step="0.01" id="s-ctr" oninput="calcMetas()"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Connect rate (%)</label><input type="number" placeholder="76" id="s-connect" oninput="calcMetas()"></div>
+        <div class="field"><label>Conversão do evento (%)</label><input type="number" placeholder="6,5" step="0.1" id="s-conv-evento" oninput="calcMetas()"></div>
+      </div>
+
+      <!-- ORIGEM DAS VENDAS -->
+      <p style="font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;margin-top:4px;text-transform:uppercase;letter-spacing:0.4px">Origem esperada dos ingressos (%)</p>
+      <div class="field-row">
+        <div class="field"><label>Tráfego pago</label><input type="number" placeholder="51%" id="s-orig-trafego" oninput="calcOrigem()"></div>
+        <div class="field"><label>Conteúdo orgânico</label><input type="number" placeholder="20%" id="s-orig-conteudo" oninput="calcOrigem()"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Base (lista)</label><input type="number" placeholder="12%" id="s-orig-base" oninput="calcOrigem()"></div>
+        <div class="field"><label>Outros</label><input type="number" placeholder="17%" id="s-orig-outros" oninput="calcOrigem()"></div>
+      </div>
+
+      <!-- PREVIEW DE METAS -->
+      <div id="metas-preview" style="display:none;background:var(--surface-1);border-radius:var(--radius);padding:12px;margin-top:8px">
+        <p style="font-size:11px;font-weight:500;color:var(--text-secondary);margin-bottom:8px">Projeção gerada automaticamente</p>
+        <div id="metas-list" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>
+      </div>
+    </div>
+
     <div style="border-top:0.5px solid var(--border);margin:14px 0 12px;padding-top:14px">
       <p style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:10px"><i class="ti ti-calendar-event" style="font-size:14px;vertical-align:-2px"></i> &nbsp;Datas principais — os sprints serão organizados automaticamente</p>
       <div class="field-row">
@@ -680,6 +740,51 @@ function go(id) {
 function toggleArea(id) {
   const el = document.getElementById('at-' + id);
   el.classList.toggle('open');
+}
+
+function parseBRL(v) { return parseFloat((v||'').replace(/[R$\s.]/g,'').replace(',','.')) || 0; }
+function fmtBRL(v) { return 'R$ ' + Math.round(v).toLocaleString('pt-BR'); }
+
+function calcMetas() {
+  const ingressos = parseFloat(document.getElementById('s-ingressos').value) || 0;
+  const ticketIngresso = parseBRL(document.getElementById('s-ticket-ingresso').value);
+  const ticketMedio = parseBRL(document.getElementById('s-ticket-medio').value);
+  const conversao = parseFloat(document.getElementById('s-conversao').value) || 0;
+
+  if (!ingressos && !ticketMedio) { document.getElementById('metas-preview').style.display='none'; return; }
+
+  const vendasProd = Math.round(ingressos * (conversao/100));
+  const fatIngressos = ingressos * ticketIngresso;
+  const fatProd = vendasProd * ticketMedio;
+  const fatTotal = fatIngressos + fatProd;
+
+  const items = [
+    { label: 'Ingressos meta', value: ingressos.toLocaleString('pt-BR') },
+    { label: 'Fat. ingressos', value: fmtBRL(fatIngressos) },
+    { label: 'Vendas produto', value: vendasProd.toLocaleString('pt-BR') },
+    { label: 'Fat. produto', value: fmtBRL(fatProd) },
+    { label: 'Faturamento total', value: fmtBRL(fatTotal), highlight: true },
+    { label: 'Conversão aplicada', value: conversao + '%' },
+  ];
+
+  document.getElementById('metas-list').innerHTML = items.map(i => `
+    <div style="background:var(--surface-2);border-radius:6px;padding:8px 10px;border:0.5px solid var(--border)${i.highlight?';border-color:var(--accent-border)':''}">
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">${i.label}</div>
+      <div style="font-size:13px;font-weight:600;color:${i.highlight?'var(--accent-text)':'var(--text-primary)'}">${i.value}</div>
+    </div>`).join('');
+  document.getElementById('metas-preview').style.display = 'block';
+}
+
+function calcOrigem() {
+  const t = parseFloat(document.getElementById('s-orig-trafego').value)||0;
+  const c = parseFloat(document.getElementById('s-orig-conteudo').value)||0;
+  const b = parseFloat(document.getElementById('s-orig-base').value)||0;
+  const o = parseFloat(document.getElementById('s-orig-outros').value)||0;
+  const total = t+c+b+o;
+  const fields = ['s-orig-trafego','s-orig-conteudo','s-orig-base','s-orig-outros'];
+  fields.forEach(f => {
+    document.getElementById(f).style.borderColor = total > 100 ? 'var(--danger-text)' : '';
+  });
 }
 
 function fmtDate(d) {
