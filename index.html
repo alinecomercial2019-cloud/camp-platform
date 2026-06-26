@@ -191,6 +191,15 @@
   .post-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; }
   .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 
+  /* Estratégia */
+  .estr-field { margin-bottom:10px; }
+  .estr-field label { font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px; }
+  .estr-field input { width:100%;padding:6px 8px;border-radius:var(--radius);border:0.5px solid transparent;background:transparent;color:var(--text-primary);font-size:13px;font-family:var(--font);transition:all 0.15s; }
+  .estr-field input:not([disabled]) { border-color:var(--border-strong);background:var(--surface-1); }
+  .estr-field input:not([disabled]):focus { border-color:var(--accent);outline:none; }
+  .estr-sprint-input { flex:1;padding:4px 8px;border-radius:var(--radius);border:0.5px solid transparent;background:transparent;color:var(--text-secondary);font-size:12px;font-family:var(--font);transition:all 0.15s; }
+  .estr-sprint-input:not([disabled]) { border-color:var(--border-strong);background:var(--surface-2); }
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -214,6 +223,7 @@
       <div class="nav-item" onclick="go('projetos')"><i class="ti ti-folder"></i> Projetos</div>
       <div class="nav-item" onclick="go('tasks')"><i class="ti ti-layout-kanban"></i> Tasks — WSPJ</div>
       <div class="nav-item" onclick="go('time')"><i class="ti ti-users"></i> Time — WSPJ</div>
+      <div class="nav-item" onclick="go('estrategia-proj')"><i class="ti ti-target"></i> Estratégia — WSPJ</div>
       <div class="nav-item" onclick="go('metricas')"><i class="ti ti-chart-bar"></i> Métricas</div>
       <div class="nav-label">Comunidade</div>
       <div class="nav-item" onclick="go('lives')"><i class="ti ti-video"></i> Lives & mentorias</div>
@@ -532,6 +542,183 @@
         </div>
       </div>
 
+      <!-- ESTRATÉGIA DO PROJETO -->
+      <div class="screen" id="screen-estrategia-proj">
+        <div class="row">
+          <div><p class="page-title">WSPJ — Estratégia do lançamento</p><p class="page-sub">Todas as decisões e metas do projeto · editável a qualquer momento</p></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn" id="btn-editar" onclick="toggleEdit()"><i class="ti ti-edit"></i> Editar</button>
+            <button class="btn btn-primary" id="btn-salvar" style="display:none" onclick="salvarEstrategia()"><i class="ti ti-check"></i> Salvar alterações</button>
+          </div>
+        </div>
+
+        <!-- HISTORICO DE DECISÕES -->
+        <div class="card" style="margin-bottom:12px;background:var(--accent-bg);border-color:var(--accent-border)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <p style="font-size:13px;font-weight:500;color:var(--accent-text)"><i class="ti ti-history"></i> &nbsp;Histórico de decisões</p>
+            <button class="btn" style="font-size:11px;padding:4px 10px;color:var(--accent-text);border-color:var(--accent-border)" onclick="addDecisao()"><i class="ti ti-plus"></i> Nova decisão</button>
+          </div>
+          <div id="decisoes-list" style="display:flex;flex-direction:column;gap:6px">
+            <div class="decisao-item" style="background:var(--surface-2);border-radius:var(--radius);padding:10px 12px;border:0.5px solid var(--accent-border)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+                <span style="font-size:11px;font-weight:500;color:var(--accent-text)">Produto principal</span>
+                <span style="font-size:10px;color:var(--text-muted)">26 jun 2026</span>
+              </div>
+              <p style="font-size:12px;color:var(--text-primary)">Decidido fazer Workshop São Paulo Jr com foco em designers iniciantes. Ticket de R$1.797 com cashback para alunos antigos.</p>
+            </div>
+            <div class="decisao-item" style="background:var(--surface-2);border-radius:var(--radius);padding:10px 12px;border:0.5px solid var(--accent-border)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+                <span style="font-size:11px;font-weight:500;color:var(--accent-text)">Estratégia de captação</span>
+                <span style="font-size:10px;color:var(--text-muted)">26 jun 2026</span>
+              </div>
+              <p style="font-size:12px;color:var(--text-primary)">Meta de 5.000 ingressos. Começar com CPM de R$28 e CTR de 1,2%. Ajustar na semana 2 conforme performance.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:12px">
+
+          <!-- INGRESSOS -->
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#2563eb"></div>
+              <p style="font-size:13px;font-weight:500">Ingressos / Captação</p>
+            </div>
+            <div class="estr-field"><label>Meta de ingressos</label><input type="number" value="5000" disabled></div>
+            <div class="estr-field"><label>Ticket médio</label><input type="text" value="R$ 44,00" disabled></div>
+            <div class="estr-field"><label>Fat. esperado ingressos</label><input type="text" value="R$ 220.000" disabled style="color:var(--accent-text);font-weight:500"></div>
+          </div>
+
+          <!-- PRODUTO PRINCIPAL -->
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#15803d"></div>
+              <p style="font-size:13px;font-weight:500">Produto principal</p>
+            </div>
+            <div class="estr-field"><label>Ticket oferta</label><input type="text" value="R$ 1.797,00" disabled></div>
+            <div class="estr-field"><label>Ticket médio esperado</label><input type="text" value="R$ 1.200,00" disabled></div>
+            <div class="estr-field"><label>Conversão esperada</label><input type="text" value="14%" disabled></div>
+            <div class="estr-field"><label>Meta de vendas</label><input type="text" value="700 vendas" disabled style="color:var(--accent-text);font-weight:500"></div>
+          </div>
+
+          <!-- ORDERBUMP -->
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#b45309"></div>
+              <p style="font-size:13px;font-weight:500">Orderbump principal</p>
+            </div>
+            <div class="estr-field"><label>Produto</label><input type="text" value="Workshop em formato de aulas" disabled></div>
+            <div class="estr-field"><label>Ticket</label><input type="text" value="R$ 197,00" disabled></div>
+            <div class="estr-field"><label>Conversão esperada</label><input type="text" value="22%" disabled></div>
+          </div>
+
+          <!-- TRÁFEGO -->
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#dc2626"></div>
+              <p style="font-size:13px;font-weight:500">Simulação de tráfego</p>
+            </div>
+            <div class="estr-field"><label>Verba total</label><input type="text" value="R$ 330.000,00" disabled></div>
+            <div class="estr-field"><label>CPM estimado</label><input type="text" value="R$ 28,00" disabled></div>
+            <div class="estr-field"><label>CTR estimado</label><input type="text" value="0,95%" disabled></div>
+            <div class="estr-field"><label>Conversão do evento</label><input type="text" value="6,5%" disabled></div>
+          </div>
+
+        </div>
+
+        <!-- ORIGEM DAS VENDAS + FATURAMENTO -->
+        <div class="grid-2" style="margin-bottom:12px">
+          <div class="card">
+            <p style="font-size:13px;font-weight:500;margin-bottom:12px">Origem esperada dos ingressos</p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:var(--text-secondary);width:130px">Tráfego pago</span>
+                <div style="flex:1;height:6px;background:var(--surface-1);border-radius:99px;overflow:hidden"><div style="width:51%;height:100%;background:var(--accent);border-radius:99px"></div></div>
+                <input type="text" value="51%" disabled style="width:48px;font-size:12px;text-align:right;border:none;background:transparent;color:var(--text-primary);font-family:var(--font);padding:0" class="estr-origem">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:var(--text-secondary);width:130px">Conteúdo orgânico</span>
+                <div style="flex:1;height:6px;background:var(--surface-1);border-radius:99px;overflow:hidden"><div style="width:20%;height:100%;background:#15803d;border-radius:99px"></div></div>
+                <input type="text" value="20%" disabled style="width:48px;font-size:12px;text-align:right;border:none;background:transparent;color:var(--text-primary);font-family:var(--font);padding:0" class="estr-origem">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:var(--text-secondary);width:130px">Base (lista)</span>
+                <div style="flex:1;height:6px;background:var(--surface-1);border-radius:99px;overflow:hidden"><div style="width:12%;height:100%;background:#b45309;border-radius:99px"></div></div>
+                <input type="text" value="12%" disabled style="width:48px;font-size:12px;text-align:right;border:none;background:transparent;color:var(--text-primary);font-family:var(--font);padding:0" class="estr-origem">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:var(--text-secondary);width:130px">Outros</span>
+                <div style="flex:1;height:6px;background:var(--surface-1);border-radius:99px;overflow:hidden"><div style="width:17%;height:100%;background:#64748b;border-radius:99px"></div></div>
+                <input type="text" value="17%" disabled style="width:48px;font-size:12px;text-align:right;border:none;background:transparent;color:var(--text-primary);font-family:var(--font);padding:0" class="estr-origem">
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="background:var(--surface-1)">
+            <p style="font-size:13px;font-weight:500;margin-bottom:14px">Projeção de faturamento</p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;padding-bottom:6px;border-bottom:0.5px solid var(--border)">
+                <span style="font-size:12px;color:var(--text-secondary)">Ingressos</span>
+                <span style="font-size:12px;font-weight:500">R$ 220.000</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:6px;border-bottom:0.5px solid var(--border)">
+                <span style="font-size:12px;color:var(--text-secondary)">Produto principal</span>
+                <span style="font-size:12px;font-weight:500">R$ 840.000</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:6px;border-bottom:0.5px solid var(--border)">
+                <span style="font-size:12px;color:var(--text-secondary)">Orderbump</span>
+                <span style="font-size:12px;font-weight:500">R$ 216.700</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-top:4px">
+                <span style="font-size:13px;font-weight:600;color:var(--accent-text)">Total projetado</span>
+                <span style="font-size:15px;font-weight:700;color:var(--accent-text)">R$ 1.276.700</span>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <span style="font-size:11px;color:var(--text-muted)">Investimento tráfego</span>
+                <span style="font-size:11px;color:var(--text-muted)">R$ 330.000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SPRINTS -->
+        <div class="card">
+          <p style="font-size:13px;font-weight:500;margin-bottom:12px"><i class="ti ti-calendar-event" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>Sprints do lançamento</p>
+          <div style="display:flex;flex-direction:column;gap:6px" id="sprints-estr">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface-1);border-radius:var(--radius)">
+              <span style="width:10px;height:10px;border-radius:50%;background:#7c3aed;min-width:10px"></span>
+              <span style="font-size:13px;font-weight:500;min-width:160px">Produção</span>
+              <input type="text" value="01 jun → 30 jun" disabled class="estr-sprint-input">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface-1);border-radius:var(--radius)">
+              <span style="width:10px;height:10px;border-radius:50%;background:#2563eb;min-width:10px"></span>
+              <span style="font-size:13px;font-weight:500;min-width:160px">Captação</span>
+              <input type="text" value="01 jul → 14 jul" disabled class="estr-sprint-input">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface-1);border-radius:var(--radius)">
+              <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;min-width:10px"></span>
+              <span style="font-size:13px;font-weight:500;min-width:160px">Workshop</span>
+              <input type="text" value="15 jul → 16 jul" disabled class="estr-sprint-input">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface-1);border-radius:var(--radius)">
+              <span style="width:10px;height:10px;border-radius:50%;background:#ea580c;min-width:10px"></span>
+              <span style="font-size:13px;font-weight:500;min-width:160px">Carrinho aberto</span>
+              <input type="text" value="17 jul → 31 jul" disabled class="estr-sprint-input">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface-1);border-radius:var(--radius)">
+              <span style="width:10px;height:10px;border-radius:50%;background:#dc2626;min-width:10px"></span>
+              <span style="font-size:13px;font-weight:500;min-width:160px">Fechamento</span>
+              <input type="text" value="31 jul" disabled class="estr-sprint-input">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface-1);border-radius:var(--radius)">
+              <span style="width:10px;height:10px;border-radius:50%;background:#64748b;min-width:10px"></span>
+              <span style="font-size:13px;font-weight:500;min-width:160px">Pós-lançamento</span>
+              <input type="text" value="01 ago → 21 ago" disabled class="estr-sprint-input">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- MÉTRICAS -->
       <div class="screen" id="screen-metricas">
         <p class="page-title">Métricas do lançamento</p>
@@ -726,7 +913,6 @@
 </div>
 
 <script>
-const titles = { home:'Home', estudo:'Área de estudo', projetos:'Projetos', tasks:'WSPJ — Tasks', time:'WSPJ — Time', metricas:'Métricas', lives:'Lives & mentorias', comunidade:'Comunidade' };
 function go(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -740,6 +926,39 @@ function go(id) {
 function toggleArea(id) {
   const el = document.getElementById('at-' + id);
   el.classList.toggle('open');
+}
+
+const titles = { home:'Home', estudo:'Área de estudo', projetos:'Projetos', tasks:'WSPJ — Tasks', time:'WSPJ — Time', 'estrategia-proj':'WSPJ — Estratégia', metricas:'Métricas', lives:'Lives & mentorias', comunidade:'Comunidade' };
+
+let modoEdicao = false;
+function toggleEdit() {
+  modoEdicao = !modoEdicao;
+  const inputs = document.querySelectorAll('#screen-estrategia-proj input');
+  inputs.forEach(i => { if(modoEdicao) i.removeAttribute('disabled'); else i.setAttribute('disabled',''); });
+  document.getElementById('btn-editar').style.display = modoEdicao ? 'none' : '';
+  document.getElementById('btn-salvar').style.display = modoEdicao ? '' : 'none';
+}
+function salvarEstrategia() {
+  modoEdicao = false;
+  const inputs = document.querySelectorAll('#screen-estrategia-proj input');
+  inputs.forEach(i => i.setAttribute('disabled',''));
+  document.getElementById('btn-editar').style.display = '';
+  document.getElementById('btn-salvar').style.display = 'none';
+  const toast = document.createElement('div');
+  toast.textContent = 'Estratégia salva com sucesso';
+  toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#15803d;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;animation:fadein 0.2s ease';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+function addDecisao() {
+  const texto = prompt('Descreva a decisão tomada:');
+  if (!texto) return;
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+  const el = document.createElement('div');
+  el.className = 'decisao-item';
+  el.style.cssText = 'background:var(--surface-2);border-radius:var(--radius);padding:10px 12px;border:0.5px solid var(--accent-border)';
+  el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;font-weight:500;color:var(--accent-text)">Nova decisão</span><span style="font-size:10px;color:var(--text-muted)">${hoje}</span></div><p style="font-size:12px;color:var(--text-primary)">${texto}</p>`;
+  document.getElementById('decisoes-list').prepend(el);
 }
 
 function parseBRL(v) { return parseFloat((v||'').replace(/[R$\s.]/g,'').replace(',','.')) || 0; }
