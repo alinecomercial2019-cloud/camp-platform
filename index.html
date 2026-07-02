@@ -167,6 +167,16 @@
   .live-info-text { flex: 1; }
   .live-info-text p { font-size: 14px; font-weight: 500; }
   .live-info-text span { font-size: 12px; color: var(--text-muted); }
+  .live-countdown { display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 600; color: var(--accent-text); background: var(--accent-bg); padding: 3px 9px; border-radius: 20px; }
+  .live-countdown.live-now { color: var(--success-text); background: var(--success-bg); }
+  .live-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  .live-detail-section { margin-top: 14px; }
+  .live-detail-section .section-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+  .live-pauta-item { display: flex; gap: 8px; font-size: 13px; color: var(--text-primary); padding: 6px 0; border-bottom: 0.5px solid var(--border); }
+  .live-pauta-item:last-child { border-bottom: none; }
+  .live-material-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--accent-text); padding: 6px 0; }
+  .live-link-box { display: flex; align-items: center; gap: 8px; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 8px 10px; font-size: 12px; color: var(--text-primary); margin-top: 4px; }
+  .live-link-box span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* MÉTRICAS */
   .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
@@ -902,18 +912,33 @@
         <p class="page-sub">Agenda das 12 mentorias em grupo do Rise Live</p>
         <div class="live-card" style="border-color:var(--accent)">
           <div class="live-date"><div class="month">JUL</div><div class="day">03</div></div>
-          <div class="live-info-text"><p>Mentoria #4 — Estratégia de captação</p><span>19h00 · Willian Baldan · Zoom</span></div>
-          <button class="btn btn-primary"><i class="ti ti-video"></i> Acessar</button>
+          <div class="live-info-text">
+            <p>Mentoria #4 — Estratégia de captação</p>
+            <span>19h00 · Willian Baldan · Zoom</span>
+            <div><span class="live-countdown" id="countdown-0">calculando...</span></div>
+          </div>
+          <div class="live-actions">
+            <button class="btn btn-primary" id="acessar-0" onclick="acessarLive(0)"><i class="ti ti-video"></i> Acessar</button>
+            <button class="btn" style="font-size:11px;padding:4px 10px" onclick="abrirDetalhesLive(0)">Ver pauta</button>
+          </div>
         </div>
         <div class="live-card">
           <div class="live-date"><div class="month">JUL</div><div class="day">17</div></div>
-          <div class="live-info-text"><p>Mentoria #5 — Análise de lançamentos ao vivo</p><span>19h00 · Willian Baldan · Zoom</span></div>
-          <button class="btn">Ver detalhes</button>
+          <div class="live-info-text">
+            <p>Mentoria #5 — Análise de lançamentos ao vivo</p>
+            <span>19h00 · Willian Baldan · Zoom</span>
+            <div><span class="live-countdown" id="countdown-1">calculando...</span></div>
+          </div>
+          <button class="btn" onclick="abrirDetalhesLive(1)">Ver detalhes</button>
         </div>
         <div class="live-card" style="opacity:0.6">
           <div class="live-date"><div class="month">AGO</div><div class="day">07</div></div>
-          <div class="live-info-text"><p>Mentoria #6 — Aquecimento e copy</p><span>19h00 · Willian Baldan · Zoom</span></div>
-          <button class="btn">Ver detalhes</button>
+          <div class="live-info-text">
+            <p>Mentoria #6 — Aquecimento e copy</p>
+            <span>19h00 · Willian Baldan · Zoom</span>
+            <div><span class="live-countdown" id="countdown-2">calculando...</span></div>
+          </div>
+          <button class="btn" onclick="abrirDetalhesLive(2)">Ver detalhes</button>
         </div>
         <div style="margin-top:20px">
           <div class="section-title">Gravações anteriores</div>
@@ -982,6 +1007,30 @@
         <button class="btn" id="ob-skip" onclick="fecharOnboarding()">Pular</button>
         <button class="btn btn-primary" id="ob-next" onclick="nextOnboarding()">Próximo <i class="ti ti-arrow-right"></i></button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ACESSO À LIVE -->
+<div class="modal-overlay" id="modal-acesso-live" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:420px">
+    <p class="modal-title" id="acesso-titulo">Acessar mentoria</p>
+    <div id="acesso-corpo"></div>
+  </div>
+</div>
+
+<!-- MODAL PAUTA DA LIVE -->
+<div class="modal-overlay" id="modal-detalhes-live" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:460px">
+    <p class="modal-title" id="detalhes-titulo">Mentoria</p>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:-10px;margin-bottom:4px" id="detalhes-sub"></p>
+    <div class="live-detail-section">
+      <div class="section-title">Pauta</div>
+      <div id="detalhes-pauta"></div>
+    </div>
+    <div class="live-detail-section">
+      <div class="section-title">Material de apoio</div>
+      <div id="detalhes-materiais"></div>
     </div>
   </div>
 </div>
@@ -1166,6 +1215,93 @@ function renderOb() {
   document.querySelectorAll('.ob-dot').forEach((d,i) => { d.classList.toggle('active', i === obStep); });
   document.getElementById('ob-next').innerHTML = obStep < obSteps.length - 1 ? 'Próximo <i class="ti ti-arrow-right"></i>' : '<i class="ti ti-check"></i> Começar';
   document.getElementById('ob-skip').style.display = obStep < obSteps.length - 1 ? '' : 'none';
+}
+
+// Lives & mentorias
+const livesData = [
+  {
+    data: new Date('2026-07-03T19:00:00'),
+    titulo: 'Mentoria #4 — Estratégia de captação',
+    zoomLink: 'https://zoom.us/j/91827364501',
+    pauta: ['Diagnóstico das campanhas ativas dos mentorados', 'Ajustes de segmentação e orçamento para a próxima fase', 'Cases de captação com CPL abaixo da média', 'Perguntas e respostas ao vivo'],
+    materiais: ['Planilha de metas de captação', 'Checklist de campanhas']
+  },
+  {
+    data: new Date('2026-07-17T19:00:00'),
+    titulo: 'Mentoria #5 — Análise de lançamentos ao vivo',
+    zoomLink: 'https://zoom.us/j/92736450192',
+    pauta: ['Revisão dos lançamentos em andamento na turma', 'Leitura de métricas de funil e conversão', 'Ajustes de oferta a partir dos resultados parciais'],
+    materiais: ['Template de análise de funil']
+  },
+  {
+    data: new Date('2026-08-07T19:00:00'),
+    titulo: 'Mentoria #6 — Aquecimento e copy',
+    zoomLink: 'https://zoom.us/j/93645019273',
+    pauta: ['Estrutura de aquecimento por e-mail e WhatsApp', 'Copywriting para páginas de captura e carrinho', 'Construção de storytelling para o lançamento'],
+    materiais: ['Guia de copy para aquecimento', 'Exemplos de sequência de e-mails']
+  }
+];
+
+function formatarContagem(destino) {
+  const diff = destino - new Date();
+  if (diff <= 0) return { texto: 'Ao vivo agora', aoVivo: true };
+  const dias = Math.floor(diff / 86400000);
+  const horas = Math.floor((diff % 86400000) / 3600000);
+  const min = Math.floor((diff % 3600000) / 60000);
+  const seg = Math.floor((diff % 60000) / 1000);
+  if (dias > 0) return { texto: `Começa em ${dias}d ${horas}h ${min}min`, aoVivo: false };
+  if (horas > 0) return { texto: `Começa em ${horas}h ${min}min`, aoVivo: false };
+  return { texto: `Começa em ${min}min ${seg}s`, aoVivo: false };
+}
+
+function atualizarContagensLive() {
+  livesData.forEach((live, i) => {
+    const el = document.getElementById('countdown-' + i);
+    if (!el) return;
+    const { texto, aoVivo } = formatarContagem(live.data);
+    el.textContent = texto;
+    el.classList.toggle('live-now', aoVivo);
+    if (i === 0) {
+      const btn = document.getElementById('acessar-0');
+      if (btn) btn.innerHTML = aoVivo ? '<i class="ti ti-video"></i> Entrar agora' : '<i class="ti ti-video"></i> Acessar';
+    }
+  });
+}
+atualizarContagensLive();
+setInterval(atualizarContagensLive, 1000);
+
+function acessarLive(i) {
+  const live = livesData[i];
+  const liberado = (live.data - new Date()) <= 15 * 60000;
+  document.getElementById('acesso-titulo').textContent = live.titulo;
+  const corpo = document.getElementById('acesso-corpo');
+  if (liberado) {
+    corpo.innerHTML = `<p style="font-size:13px;color:var(--text-primary);margin-bottom:10px">A sala está liberada. Use o link abaixo para entrar na mentoria.</p>
+      <div class="live-link-box"><span>${live.zoomLink}</span><button class="btn" style="font-size:11px;padding:4px 10px" onclick="copiarLinkLive('${live.zoomLink}')">Copiar</button></div>
+      <a href="${live.zoomLink}" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px"><i class="ti ti-video"></i> Abrir Zoom</a>`;
+  } else {
+    corpo.innerHTML = `<p style="font-size:13px;color:var(--text-primary)">O link de acesso é liberado 15 minutos antes do início da mentoria.</p>
+      <div class="live-countdown" style="margin-top:10px">${formatarContagem(live.data).texto}</div>`;
+  }
+  document.getElementById('modal-acesso-live').classList.add('open');
+}
+
+function copiarLinkLive(link) {
+  navigator.clipboard && navigator.clipboard.writeText(link);
+  const toast = document.createElement('div');
+  toast.textContent = 'Link copiado';
+  toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#15803d;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;animation:fadein 0.2s ease';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+function abrirDetalhesLive(i) {
+  const live = livesData[i];
+  document.getElementById('detalhes-titulo').textContent = live.titulo;
+  document.getElementById('detalhes-sub').textContent = live.data.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}) + ' · 19h00 · Willian Baldan · Zoom';
+  document.getElementById('detalhes-pauta').innerHTML = live.pauta.map(p => `<div class="live-pauta-item"><i class="ti ti-point-filled" style="font-size:8px;margin-top:6px;color:var(--accent)"></i><span>${p}</span></div>`).join('');
+  document.getElementById('detalhes-materiais').innerHTML = live.materiais.map(m => `<div class="live-material-item"><i class="ti ti-file-text"></i><span>${m}</span></div>`).join('');
+  document.getElementById('modal-detalhes-live').classList.add('open');
 }
 
 function toggleArea(id) {
