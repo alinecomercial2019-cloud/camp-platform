@@ -190,6 +190,31 @@
   .admin-table tr.clickable:hover td { background: var(--surface-1); }
   .admin-mentorado-cell { display: flex; align-items: center; gap: 10px; }
   .admin-progress-mini { width: 70px; }
+  .admin-kpi-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .admin-kpi-card .kpi-val { font-size: 26px; font-weight: 700; color: var(--text-primary); }
+  .admin-kpi-card .kpi-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .admin-kpi-card .kpi-trend { font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+  .admin-alert { background: var(--danger-bg); border: 0.5px solid var(--danger-border); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+  .admin-activity-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid var(--border); }
+  .admin-activity-item:last-child { border-bottom: none; }
+  .admin-activity-dot { width: 8px; height: 8px; border-radius: 50%; min-width: 8px; }
+  .admin-filter-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .admin-filter-btn { padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 0.5px solid var(--border); background: var(--surface-2); color: var(--text-secondary); }
+  .admin-filter-btn.active { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent-border); font-weight: 500; }
+  .admin-mentorado-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0.5px solid var(--border); border-radius: 10px; cursor: pointer; background: var(--surface-2); margin-bottom: 8px; transition: border-color 0.1s; }
+  .admin-mentorado-row:hover { border-color: var(--accent); }
+  .admin-mentorado-info { flex: 1; min-width: 0; }
+  .admin-mentorado-info p { font-size: 13px; font-weight: 500; }
+  .admin-mentorado-info span { font-size: 11px; color: var(--text-muted); }
+  .admin-live-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .admin-live-info { flex: 1; }
+  .admin-live-info p { font-size: 13px; font-weight: 500; }
+  .admin-live-info span { font-size: 11px; color: var(--text-muted); }
+  .engaj-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .engaj-bar-wrap { flex: 1; }
+  .engaj-bar-wrap .engaj-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .fin-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .fin-row:last-child { border-bottom: none; }
 
   /* MÉTRICAS */
   .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
@@ -1005,8 +1030,14 @@
       <div class="logo-sub">Painel Admin — Orbyka</div>
     </div>
     <div class="nav">
-      <div class="nav-label">Geral</div>
+      <div class="nav-label">Visão geral</div>
       <div class="nav-item active" onclick="goAdmin('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="nav-item" onclick="goAdmin('mentorados')"><i class="ti ti-users"></i> Mentorados</div>
+      <div class="nav-label">Conteúdo</div>
+      <div class="nav-item" onclick="goAdmin('lives')"><i class="ti ti-video"></i> Lives & mentorias</div>
+      <div class="nav-label">Análise</div>
+      <div class="nav-item" onclick="goAdmin('engajamento')"><i class="ti ti-activity"></i> Engajamento</div>
+      <div class="nav-item" onclick="goAdmin('financeiro')"><i class="ti ti-chart-bar"></i> Financeiro</div>
     </div>
     <div class="admin-switch" onclick="sairModoAdmin()"><i class="ti ti-arrow-back-up"></i> Voltar ao modo Mentorado</div>
     <div class="user-area">
@@ -1028,46 +1059,156 @@
 
       <!-- ADMIN DASHBOARD -->
       <div class="screen active" id="admin-screen-dashboard">
-        <p class="page-title">Painel Admin</p>
-        <p class="page-sub">Visão geral de todos os mentorados do Rise Live</p>
+        <p class="page-title">Bom dia, Willian 👋</p>
+        <p class="page-sub">Visão geral da turma Rise Live · <span id="admin-data-hoje"></span></p>
 
-        <div class="grid-3" style="margin-bottom:16px">
-          <div class="metric-card">
-            <div class="metric-label">Mentorados ativos</div>
-            <div class="metric-value" id="admin-kpi-ativos">—</div>
-            <div class="metric-sub">com lançamento em andamento</div>
+        <!-- ALERTA TRAVADOS -->
+        <div class="admin-alert" id="admin-alert-travados" style="display:none">
+          <i class="ti ti-alert-triangle" style="font-size:20px;color:var(--danger-text)"></i>
+          <div style="flex:1">
+            <p style="font-size:13px;font-weight:600;color:var(--danger-text)" id="admin-alert-msg"></p>
+            <p style="font-size:11px;color:var(--danger-text);opacity:0.8">Eles podem precisar de um contato direto da Orbyka.</p>
           </div>
-          <div class="metric-card">
-            <div class="metric-label">Lançamentos em andamento</div>
-            <div class="metric-value" id="admin-kpi-lancamentos">—</div>
-            <div class="metric-sub">de todos os mentorados</div>
+          <button class="btn" style="font-size:12px;color:var(--danger-text);border-color:var(--danger-border)" onclick="goAdmin('mentorados');filtrarMentorados('travado')">Ver mentorados</button>
+        </div>
+
+        <!-- KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px">
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Mentorados</div>
+            <div class="kpi-val" id="akpi-total">—</div>
+            <div class="kpi-trend" style="color:var(--success-text)"><i class="ti ti-trending-up" style="font-size:13px"></i> turma ativa</div>
           </div>
-          <div class="metric-card">
-            <div class="metric-label">Mentorados travados</div>
-            <div class="metric-value" style="color:var(--danger-text)" id="admin-kpi-travados">—</div>
-            <div class="metric-sub">precisam de atenção</div>
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Em andamento</div>
+            <div class="kpi-val" id="akpi-andamento">—</div>
+            <div class="kpi-trend" style="color:var(--text-muted)">lançamentos</div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Precisam atenção</div>
+            <div class="kpi-val" style="color:var(--warning-text)" id="akpi-atencao">—</div>
+            <div class="kpi-trend" style="color:var(--warning-text)"><i class="ti ti-clock" style="font-size:13px"></i> atenção</div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Travados</div>
+            <div class="kpi-val" style="color:var(--danger-text)" id="akpi-travados">—</div>
+            <div class="kpi-trend" style="color:var(--danger-text)"><i class="ti ti-alert-circle" style="font-size:13px"></i> sem atividade</div>
+          </div>
+          <div class="admin-kpi-card" style="border-color:var(--accent-border);background:var(--accent-bg)">
+            <div class="kpi-label" style="color:var(--accent-text)">Fat. total projetado</div>
+            <div class="kpi-val" style="color:var(--accent-text);font-size:18px" id="akpi-fat">—</div>
+            <div class="kpi-trend" style="color:var(--accent-text)">somando todos os Rise</div>
           </div>
         </div>
 
-        <div class="next-live" style="margin-bottom:16px">
-          <div class="live-info">
-            <p><span class="live-dot"></span>Próxima mentoria: Estratégia de captação</p>
-            <span id="admin-proxima-live">carregando...</span>
+        <div class="grid-2" style="margin-bottom:16px">
+          <!-- PRÓXIMA LIVE -->
+          <div class="next-live" style="margin-bottom:0;flex-direction:column;align-items:flex-start;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+              <div class="live-info">
+                <p><span class="live-dot"></span>Próxima mentoria</p>
+                <span style="font-size:13px;font-weight:500" id="admin-live-titulo">—</span>
+              </div>
+              <button class="btn" style="font-size:11px;padding:5px 10px;color:var(--danger-text);border-color:var(--danger-border)" onclick="goAdmin('lives')"><i class="ti ti-settings"></i> Gerenciar</button>
+            </div>
+            <span id="admin-proxima-live" style="font-size:11px;color:var(--danger-text);opacity:0.8"></span>
           </div>
-          <button class="btn btn-primary" onclick="go('lives');sairModoAdmin()"><i class="ti ti-video"></i> Gerenciar lives</button>
+
+          <!-- PROGRESSO MÉDIO -->
+          <div class="card" style="display:flex;flex-direction:column;gap:8px">
+            <div class="section-title" style="margin-bottom:0">Progresso médio da turma</div>
+            <div id="admin-progress-turma" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
         </div>
 
+        <div class="grid-2">
+          <!-- TABELA DE MENTORADOS -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div class="section-title" style="margin-bottom:0">Mentorados</div>
+              <button class="btn" style="font-size:11px;padding:4px 10px" onclick="goAdmin('mentorados')">Ver todos</button>
+            </div>
+            <table class="admin-table">
+              <thead><tr><th>Nome</th><th>Fase</th><th>Status</th><th>%</th></tr></thead>
+              <tbody id="admin-mentorados-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- FEED DE ATIVIDADE -->
+          <div class="card">
+            <div class="section-title">Atividade recente</div>
+            <div id="admin-feed-atividade"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA MENTORADOS -->
+      <div class="screen" id="admin-screen-mentorados">
+        <div class="row">
+          <div><p class="page-title">Mentorados</p><p class="page-sub">Todos os membros da turma Rise Live</p></div>
+        </div>
+        <div class="admin-filter-row" id="admin-filtros">
+          <div class="admin-filter-btn active" onclick="filtrarMentorados('todos')">Todos</div>
+          <div class="admin-filter-btn" onclick="filtrarMentorados('em_dia')"><i class="ti ti-circle-check" style="font-size:12px"></i> Em dia</div>
+          <div class="admin-filter-btn" onclick="filtrarMentorados('atencao')"><i class="ti ti-clock" style="font-size:12px"></i> Atenção</div>
+          <div class="admin-filter-btn" onclick="filtrarMentorados('travado')"><i class="ti ti-alert-circle" style="font-size:12px"></i> Travados</div>
+        </div>
+        <div id="admin-mentorados-lista"></div>
+      </div>
+
+      <!-- TELA LIVES -->
+      <div class="screen" id="admin-screen-lives">
+        <div class="row">
+          <div><p class="page-title">Lives & mentorias</p><p class="page-sub">Gerencie a agenda de mentorias em grupo</p></div>
+          <button class="btn btn-primary" onclick="abrirNovaLive()"><i class="ti ti-plus"></i> Nova mentoria</button>
+        </div>
+        <div id="admin-lives-lista"></div>
+      </div>
+
+      <!-- TELA ENGAJAMENTO -->
+      <div class="screen" id="admin-screen-engajamento">
+        <p class="page-title">Engajamento da turma</p>
+        <p class="page-sub">Acompanhe quem está ativo e quem precisa de atenção</p>
+        <div class="grid-2" style="margin-bottom:16px">
+          <div class="card">
+            <div class="section-title">Acesso nos últimos 7 dias</div>
+            <div id="engaj-lista-ativos"></div>
+          </div>
+          <div class="card">
+            <div class="section-title" style="color:var(--danger-text)">Sem acesso recente</div>
+            <div id="engaj-lista-inativos"></div>
+          </div>
+        </div>
         <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div class="section-title" style="margin-bottom:0">Mentorados</div>
-            <span style="font-size:11px;color:var(--text-muted)" id="admin-mentorados-count"></span>
+          <div class="section-title">Progresso por mentorado</div>
+          <div id="engaj-progresso"></div>
+        </div>
+      </div>
+
+      <!-- TELA FINANCEIRO -->
+      <div class="screen" id="admin-screen-financeiro">
+        <p class="page-title">Financeiro da turma</p>
+        <p class="page-sub">Faturamento projetado de todos os lançamentos ativos</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="admin-kpi-card" style="background:var(--accent-bg);border-color:var(--accent-border)">
+            <div class="kpi-label" style="color:var(--accent-text)">Total projetado</div>
+            <div class="kpi-val" style="color:var(--accent-text);font-size:20px" id="fin-total">—</div>
+            <div class="kpi-trend" style="color:var(--accent-text)">somando toda a turma</div>
           </div>
-          <table class="admin-table">
-            <thead>
-              <tr><th>Mentorado</th><th>Lançamento</th><th>Fase atual</th><th>Progresso</th><th>Status</th><th>Última atividade</th></tr>
-            </thead>
-            <tbody id="admin-mentorados-tbody"></tbody>
-          </table>
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Média por mentorado</div>
+            <div class="kpi-val" style="font-size:20px" id="fin-media">—</div>
+            <div class="kpi-trend" style="color:var(--text-muted)">por lançamento</div>
+          </div>
+          <div class="admin-kpi-card" style="background:var(--success-bg);border-color:#bbf7d0">
+            <div class="kpi-label" style="color:var(--success-text)">Melhor projeção</div>
+            <div class="kpi-val" style="color:var(--success-text);font-size:20px" id="fin-maior">—</div>
+            <div class="kpi-trend" style="color:var(--success-text)" id="fin-maior-nome">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Faturamento projetado por lançamento</div>
+          <div id="fin-lista"></div>
         </div>
       </div>
 
@@ -1077,9 +1218,31 @@
 
 <!-- MODAL DETALHE MENTORADO -->
 <div class="modal-overlay" id="modal-mentorado" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal-box" style="width:440px">
+  <div class="modal-box" style="width:500px;max-height:90vh;overflow-y:auto">
     <p class="modal-title" id="mentorado-titulo">Mentorado</p>
     <div id="mentorado-corpo"></div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn" onclick="document.getElementById('modal-mentorado').classList.remove('open')">Fechar</button>
+      <button class="btn btn-primary" id="btn-contatar-mentorado"><i class="ti ti-message"></i> Enviar mensagem</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVA LIVE ADMIN -->
+<div class="modal-overlay" id="modal-nova-live" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:460px">
+    <p class="modal-title">Nova mentoria</p>
+    <div class="field"><label>Título da mentoria</label><input type="text" id="nl-titulo" placeholder="Ex: Mentoria #7 — Análise de funil"></div>
+    <div class="field-row">
+      <div class="field"><label>Data</label><input type="date" id="nl-data"></div>
+      <div class="field"><label>Horário</label><input type="time" id="nl-hora" value="19:00"></div>
+    </div>
+    <div class="field"><label>Link do Zoom</label><input type="text" id="nl-zoom" placeholder="https://zoom.us/j/..."></div>
+    <div class="field"><label>Pauta (uma por linha)</label><textarea id="nl-pauta" rows="3" style="width:100%;padding:8px 10px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-primary);font-size:13px;font-family:var(--font);resize:vertical;outline:none" placeholder="Tópico 1&#10;Tópico 2&#10;Tópico 3"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal-nova-live').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNovaLive()"><i class="ti ti-check"></i> Adicionar mentoria</button>
+    </div>
   </div>
 </div>
 
@@ -1407,18 +1570,19 @@ function abrirDetalhesLive(i) {
 
 // Painel Admin
 const mentoradosData = [
-  { nome: 'Aline', iniciais: 'AL', cor: 'var(--accent-bg)', corTexto: 'var(--accent-text)', lancamento: 'WSPJ', fase: 'Inscrições abertas', progresso: 28, status: 'em_dia', ultimaAtividade: 'há 2 horas' },
-  { nome: 'Marcos Ribeiro', iniciais: 'MR', cor: 'var(--success-bg)', corTexto: 'var(--success-text)', lancamento: 'Método Ribeiro', fase: 'Carrinho aberto', progresso: 82, status: 'em_dia', ultimaAtividade: 'há 5 horas' },
-  { nome: 'Fernanda Silva', iniciais: 'FS', cor: 'var(--warning-bg)', corTexto: 'var(--warning-text)', lancamento: 'Aquecimento Rise', fase: 'Semana s+1', progresso: 41, status: 'atencao', ultimaAtividade: 'ontem' },
-  { nome: 'Rodrigo Alves', iniciais: 'RA', cor: '#ede9fe', corTexto: '#7c3aed', lancamento: 'Lançamento Alves', fase: 'Evento', progresso: 15, status: 'travado', ultimaAtividade: 'há 6 dias' },
-  { nome: 'Camila Duarte', iniciais: 'CD', cor: 'var(--danger-bg)', corTexto: 'var(--danger-text)', lancamento: 'Rise Fit', fase: 'Inscrições abertas', progresso: 9, status: 'travado', ultimaAtividade: 'há 9 dias' },
-  { nome: 'Juliana Prado', iniciais: 'JP', cor: 'var(--surface-1)', corTexto: 'var(--text-muted)', lancamento: 'Prado Lançamentos', fase: 'Pós-lançamento', progresso: 100, status: 'em_dia', ultimaAtividade: 'há 1 hora' }
+  { nome: 'Aline', iniciais: 'AL', cor: 'var(--accent-bg)', corTexto: 'var(--accent-text)', lancamento: 'WSPJ', fase: 'Inscrições abertas', progresso: 28, status: 'em_dia', ultimaAtividade: 'há 2 horas', diasSemAcesso: 0, leads: 847, fatPrevisto: 1276700, metaFat: 1500000, tarefasFeitas: 3, tarefasTotal: 47, email: 'aline@orbyka.com' },
+  { nome: 'Marcos Ribeiro', iniciais: 'MR', cor: 'var(--success-bg)', corTexto: 'var(--success-text)', lancamento: 'Método Ribeiro', fase: 'Carrinho aberto', progresso: 82, status: 'em_dia', ultimaAtividade: 'há 5 horas', diasSemAcesso: 0, leads: 3210, fatPrevisto: 890000, metaFat: 800000, tarefasFeitas: 38, tarefasTotal: 47, email: 'marcos@metodor.com' },
+  { nome: 'Fernanda Silva', iniciais: 'FS', cor: 'var(--warning-bg)', corTexto: 'var(--warning-text)', lancamento: 'Aquecimento Rise', fase: 'Semana s+1', progresso: 41, status: 'atencao', ultimaAtividade: 'ontem', diasSemAcesso: 1, leads: 1540, fatPrevisto: 420000, metaFat: 600000, tarefasFeitas: 19, tarefasTotal: 47, email: 'fernanda@rise.com' },
+  { nome: 'Rodrigo Alves', iniciais: 'RA', cor: '#ede9fe', corTexto: '#7c3aed', lancamento: 'Lançamento Alves', fase: 'Evento', progresso: 15, status: 'travado', ultimaAtividade: 'há 6 dias', diasSemAcesso: 6, leads: 312, fatPrevisto: 180000, metaFat: 400000, tarefasFeitas: 7, tarefasTotal: 47, email: 'rodrigo@alves.com' },
+  { nome: 'Camila Duarte', iniciais: 'CD', cor: 'var(--danger-bg)', corTexto: 'var(--danger-text)', lancamento: 'Rise Fit', fase: 'Inscrições abertas', progresso: 9, status: 'travado', ultimaAtividade: 'há 9 dias', diasSemAcesso: 9, leads: 88, fatPrevisto: 95000, metaFat: 300000, tarefasFeitas: 4, tarefasTotal: 47, email: 'camila@risefit.com' },
+  { nome: 'Juliana Prado', iniciais: 'JP', cor: 'var(--surface-1)', corTexto: 'var(--text-muted)', lancamento: 'Prado Lançamentos', fase: 'Pós-lançamento', progresso: 100, status: 'em_dia', ultimaAtividade: 'há 1 hora', diasSemAcesso: 0, leads: 4100, fatPrevisto: 1120000, metaFat: 1000000, tarefasFeitas: 47, tarefasTotal: 47, email: 'juliana@prado.com' }
 ];
 const statusInfo = {
-  em_dia: { label: 'Em dia', badge: 'badge-green' },
-  atencao: { label: 'Atenção', badge: 'badge-amber' },
-  travado: { label: 'Travado', badge: 'badge-red' }
+  em_dia: { label: 'Em dia', badge: 'badge-green', dot: '#22c55e' },
+  atencao: { label: 'Atenção', badge: 'badge-amber', dot: '#f59e0b' },
+  travado: { label: 'Travado', badge: 'badge-red', dot: '#dc2626' }
 };
+const adminLivesData = [...livesData];
 
 function entrarModoAdmin() {
   document.querySelector('#modal-acesso-live')?.classList.remove('open');
@@ -1437,45 +1601,285 @@ function goAdmin(id) {
   document.querySelectorAll('#admin-app .nav-item').forEach(n => {
     if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) n.classList.add('active');
   });
+  const titulos = { dashboard: 'Dashboard', mentorados: 'Mentorados', lives: 'Lives & mentorias', engajamento: 'Engajamento', financeiro: 'Financeiro' };
+  document.getElementById('admin-topbar-title').textContent = titulos[id] || id;
+  if (id === 'mentorados') renderAdminMentorados('todos');
+  if (id === 'lives') renderAdminLives();
+  if (id === 'engajamento') renderAdminEngajamento();
+  if (id === 'financeiro') renderAdminFinanceiro();
+}
+
+function fmtMillions(v) {
+  if (v >= 1000000) return 'R$ ' + (v/1000000).toFixed(1).replace('.',',') + 'M';
+  if (v >= 1000) return 'R$ ' + Math.round(v/1000) + 'k';
+  return 'R$ ' + v;
 }
 
 function renderAdminDashboard() {
-  const ativos = mentoradosData.length;
-  const travados = mentoradosData.filter(m => m.status === 'travado').length;
-  document.getElementById('admin-kpi-ativos').textContent = ativos;
-  document.getElementById('admin-kpi-lancamentos').textContent = mentoradosData.filter(m => m.progresso < 100).length;
-  document.getElementById('admin-kpi-travados').textContent = travados;
-  document.getElementById('admin-mentorados-count').textContent = ativos + ' mentorados';
-  document.getElementById('admin-proxima-live').textContent = (typeof livesData !== 'undefined' ? formatarContagem(livesData[0].data).texto : '') + ' · 19h00 · Zoom';
+  const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  document.getElementById('admin-data-hoje').textContent = hoje;
 
+  const travados = mentoradosData.filter(m => m.status === 'travado');
+  const atencao = mentoradosData.filter(m => m.status === 'atencao');
+  const fatTotal = mentoradosData.reduce((s,m) => s + m.fatPrevisto, 0);
+  const progressoMedio = Math.round(mentoradosData.reduce((s,m) => s + m.progresso, 0) / mentoradosData.length);
+
+  document.getElementById('akpi-total').textContent = mentoradosData.length;
+  document.getElementById('akpi-andamento').textContent = mentoradosData.filter(m => m.progresso < 100).length;
+  document.getElementById('akpi-atencao').textContent = atencao.length;
+  document.getElementById('akpi-travados').textContent = travados.length;
+  document.getElementById('akpi-fat').textContent = fmtMillions(fatTotal);
+
+  if (travados.length > 0) {
+    document.getElementById('admin-alert-travados').style.display = 'flex';
+    document.getElementById('admin-alert-msg').textContent = travados.length === 1
+      ? `${travados[0].nome} está travado há ${travados[0].diasSemAcesso} dias sem acesso à plataforma.`
+      : `${travados.map(t=>t.nome).join(' e ')} estão travados e sem acesso recente.`;
+  }
+
+  const live0 = adminLivesData[0];
+  document.getElementById('admin-live-titulo').textContent = live0.titulo;
+  document.getElementById('admin-proxima-live').textContent = formatarContagem(live0.data).texto + ' · 19h00 · Zoom';
+
+  // Progresso turma
+  document.getElementById('admin-progress-turma').innerHTML = mentoradosData.map(m => `
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="avatar" style="width:24px;height:24px;font-size:9px;min-width:24px;background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>
+      <div style="flex:1">
+        <div class="progress-bar"><div class="progress-fill${m.progresso===100?' green':''}" style="width:${m.progresso}%"></div></div>
+      </div>
+      <span style="font-size:11px;color:var(--text-muted);min-width:30px;text-align:right">${m.progresso}%</span>
+    </div>`).join('');
+
+  // Tabela resumida
   const tbody = document.getElementById('admin-mentorados-tbody');
-  tbody.innerHTML = mentoradosData.map((m, i) => {
+  tbody.innerHTML = mentoradosData.map((m,i) => {
     const s = statusInfo[m.status];
     return `<tr class="clickable" onclick="abrirMentoradoDetalhe(${i})">
       <td><div class="admin-mentorado-cell"><div class="avatar" style="background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>${m.nome}</div></td>
-      <td>${m.lancamento}</td>
-      <td>${m.fase}</td>
-      <td><div class="admin-progress-mini"><div class="progress-bar"><div class="progress-fill${m.progresso === 100 ? ' green' : ''}" style="width:${m.progresso}%"></div></div></div></td>
+      <td style="font-size:11px;color:var(--text-muted)">${m.fase}</td>
       <td><span class="badge ${s.badge}">${s.label}</span></td>
-      <td style="color:var(--text-muted)">${m.ultimaAtividade}</td>
+      <td style="font-size:11px;font-weight:500">${m.progresso}%</td>
     </tr>`;
+  }).join('');
+
+  // Feed de atividade
+  const feedItems = [
+    { nome:'Juliana Prado', ini:'JP', cor:'var(--surface-1)', corT:'var(--text-muted)', acao:'Concluiu o lançamento Prado', tempo:'há 1h', dot:'#22c55e' },
+    { nome:'Aline', ini:'AL', cor:'var(--accent-bg)', corT:'var(--accent-text)', acao:'Atualizou a estratégia do WSPJ', tempo:'há 2h', dot:'#2563eb' },
+    { nome:'Marcos Ribeiro', ini:'MR', cor:'var(--success-bg)', corT:'var(--success-text)', acao:'Carrinho aberto — Método Ribeiro', tempo:'há 5h', dot:'#22c55e' },
+    { nome:'Fernanda Silva', ini:'FS', cor:'var(--warning-bg)', corT:'var(--warning-text)', acao:'Acessou a plataforma', tempo:'ontem', dot:'#f59e0b' },
+    { nome:'Rodrigo Alves', ini:'RA', cor:'#ede9fe', corT:'#7c3aed', acao:'Sem acesso há 6 dias', tempo:'6 dias', dot:'#dc2626' },
+  ];
+  document.getElementById('admin-feed-atividade').innerHTML = feedItems.map(f => `
+    <div class="admin-activity-item">
+      <div class="avatar" style="width:28px;height:28px;font-size:10px;min-width:28px;background:${f.cor};color:${f.corT}">${f.ini}</div>
+      <div style="flex:1">
+        <p style="font-size:12px;font-weight:500">${f.nome}</p>
+        <p style="font-size:11px;color:var(--text-muted)">${f.acao}</p>
+      </div>
+      <span style="font-size:10px;color:var(--text-muted)">${f.tempo}</span>
+      <div class="admin-activity-dot" style="background:${f.dot}"></div>
+    </div>`).join('');
+}
+
+let filtroAtual = 'todos';
+function filtrarMentorados(filtro) {
+  filtroAtual = filtro;
+  document.querySelectorAll('.admin-filter-btn').forEach(b => {
+    const match = b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + filtro + "'");
+    b.classList.toggle('active', match);
+  });
+  renderAdminMentorados(filtro);
+}
+
+function renderAdminMentorados(filtro) {
+  const lista = filtro === 'todos' ? mentoradosData : mentoradosData.filter(m => m.status === filtro);
+  document.getElementById('admin-mentorados-lista').innerHTML = lista.map((m,i) => {
+    const idx = mentoradosData.indexOf(m);
+    const s = statusInfo[m.status];
+    return `<div class="admin-mentorado-row" onclick="abrirMentoradoDetalhe(${idx})">
+      <div class="avatar" style="width:40px;height:40px;font-size:13px;min-width:40px;background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>
+      <div class="admin-mentorado-info">
+        <p>${m.nome}</p>
+        <span>${m.lancamento} · ${m.fase}</span>
+      </div>
+      <div style="text-align:center;min-width:60px">
+        <p style="font-size:14px;font-weight:600">${m.leads.toLocaleString('pt-BR')}</p>
+        <span style="font-size:10px;color:var(--text-muted)">leads</span>
+      </div>
+      <div style="text-align:center;min-width:60px">
+        <p style="font-size:14px;font-weight:600">${m.tarefasFeitas}/${m.tarefasTotal}</p>
+        <span style="font-size:10px;color:var(--text-muted)">tasks</span>
+      </div>
+      <div style="min-width:80px">
+        <div class="progress-bar" style="margin-bottom:3px"><div class="progress-fill${m.progresso===100?' green':''}" style="width:${m.progresso}%"></div></div>
+        <span style="font-size:10px;color:var(--text-muted)">${m.progresso}%</span>
+      </div>
+      <span class="badge ${s.badge}">${s.label}</span>
+      <span style="font-size:11px;color:var(--text-muted);min-width:80px;text-align:right">${m.ultimaAtividade}</span>
+    </div>`;
+  }).join('') || '<p style="font-size:13px;color:var(--text-muted);padding:20px 0">Nenhum mentorado neste filtro.</p>';
+}
+
+function renderAdminLives() {
+  document.getElementById('admin-lives-lista').innerHTML = adminLivesData.map((l,i) => {
+    const dt = l.data;
+    const mes = dt.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase().replace('.','');
+    const dia = dt.getDate();
+    const { texto } = formatarContagem(dt);
+    return `<div class="admin-live-card">
+      <div class="live-date"><div class="month">${mes}</div><div class="day">${dia}</div></div>
+      <div class="admin-live-info">
+        <p>${l.titulo}</p>
+        <span>19h00 · Zoom · <span style="color:var(--accent-text)">${texto}</span></span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn" style="font-size:11px;padding:5px 10px" onclick="copiarLinkLiveAdmin(${i})"><i class="ti ti-copy"></i> Copiar link</button>
+        <button class="btn" style="font-size:11px;padding:5px 10px;color:var(--danger-text);border-color:var(--danger-border)" onclick="excluirLive(${i})"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('') || '<p style="font-size:13px;color:var(--text-muted);padding:20px 0">Nenhuma mentoria cadastrada.</p>';
+}
+
+function copiarLinkLiveAdmin(i) {
+  navigator.clipboard && navigator.clipboard.writeText(adminLivesData[i].zoomLink);
+  const toast = document.createElement('div');
+  toast.textContent = 'Link copiado';
+  toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#15803d;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;animation:fadein 0.2s ease';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+function excluirLive(i) {
+  if (confirm('Remover esta mentoria da lista?')) {
+    adminLivesData.splice(i, 1);
+    renderAdminLives();
+  }
+}
+
+function abrirNovaLive() { document.getElementById('modal-nova-live').classList.add('open'); }
+function salvarNovaLive() {
+  const titulo = document.getElementById('nl-titulo').value.trim();
+  const data = document.getElementById('nl-data').value;
+  const hora = document.getElementById('nl-hora').value || '19:00';
+  const zoom = document.getElementById('nl-zoom').value.trim();
+  const pauta = document.getElementById('nl-pauta').value.trim().split('\n').filter(Boolean);
+  if (!titulo || !data) { alert('Preencha ao menos o título e a data.'); return; }
+  adminLivesData.push({ data: new Date(data + 'T' + hora + ':00'), titulo, zoomLink: zoom || 'https://zoom.us/j/000000000', pauta, materiais: [] });
+  adminLivesData.sort((a,b) => a.data - b.data);
+  document.getElementById('modal-nova-live').classList.remove('open');
+  renderAdminLives();
+  const toast = document.createElement('div');
+  toast.textContent = 'Mentoria adicionada com sucesso';
+  toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#15803d;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;animation:fadein 0.2s ease';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function renderAdminEngajamento() {
+  const ativos = mentoradosData.filter(m => m.diasSemAcesso <= 1);
+  const inativos = mentoradosData.filter(m => m.diasSemAcesso > 1);
+  document.getElementById('engaj-lista-ativos').innerHTML = ativos.map(m => `
+    <div class="admin-activity-item">
+      <div class="avatar" style="width:32px;height:32px;font-size:11px;min-width:32px;background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>
+      <div style="flex:1"><p style="font-size:13px;font-weight:500">${m.nome}</p><p style="font-size:11px;color:var(--text-muted)">${m.lancamento}</p></div>
+      <span style="font-size:11px;color:var(--success-text);font-weight:500">${m.ultimaAtividade}</span>
+    </div>`).join('') || '<p style="font-size:12px;color:var(--text-muted)">Nenhum ativo recentemente.</p>';
+
+  document.getElementById('engaj-lista-inativos').innerHTML = inativos.map(m => `
+    <div class="admin-activity-item">
+      <div class="avatar" style="width:32px;height:32px;font-size:11px;min-width:32px;background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>
+      <div style="flex:1"><p style="font-size:13px;font-weight:500">${m.nome}</p><p style="font-size:11px;color:var(--text-muted)">${m.lancamento}</p></div>
+      <span style="font-size:11px;color:var(--danger-text);font-weight:500">${m.ultimaAtividade}</span>
+    </div>`).join('') || '<p style="font-size:12px;color:var(--success-text)">Todos com acesso recente! 🎉</p>';
+
+  document.getElementById('engaj-progresso').innerHTML = mentoradosData.map(m => `
+    <div class="engaj-card">
+      <div class="avatar" style="width:34px;height:34px;font-size:11px;min-width:34px;background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>
+      <div class="engaj-bar-wrap">
+        <div class="engaj-label"><span>${m.nome} · ${m.fase}</span><span>${m.tarefasFeitas}/${m.tarefasTotal} tasks · ${m.progresso}%</span></div>
+        <div class="progress-bar"><div class="progress-fill${m.progresso===100?' green':''}" style="width:${m.progresso}%"></div></div>
+      </div>
+      <span class="badge ${statusInfo[m.status].badge}">${statusInfo[m.status].label}</span>
+    </div>`).join('');
+}
+
+function renderAdminFinanceiro() {
+  const fatTotal = mentoradosData.reduce((s,m) => s + m.fatPrevisto, 0);
+  const fatMedia = Math.round(fatTotal / mentoradosData.length);
+  const maior = [...mentoradosData].sort((a,b) => b.fatPrevisto - a.fatPrevisto)[0];
+  document.getElementById('fin-total').textContent = fmtMillions(fatTotal);
+  document.getElementById('fin-media').textContent = fmtMillions(fatMedia);
+  document.getElementById('fin-maior').textContent = fmtMillions(maior.fatPrevisto);
+  document.getElementById('fin-maior-nome').textContent = maior.nome + ' · ' + maior.lancamento;
+
+  const sorted = [...mentoradosData].sort((a,b) => b.fatPrevisto - a.fatPrevisto);
+  const maxFat = sorted[0].fatPrevisto;
+  document.getElementById('fin-lista').innerHTML = sorted.map((m,i) => {
+    const pct = Math.round(m.fatPrevisto / maxFat * 100);
+    const acima = m.fatPrevisto >= m.metaFat;
+    return `<div class="fin-row">
+      <div style="display:flex;align-items:center;gap:10px;min-width:180px">
+        <div class="avatar" style="width:28px;height:28px;font-size:10px;min-width:28px;background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>
+        <div><p style="font-size:13px;font-weight:500">${m.nome}</p><p style="font-size:11px;color:var(--text-muted)">${m.lancamento}</p></div>
+      </div>
+      <div style="flex:1;margin:0 16px">
+        <div class="progress-bar" style="height:8px"><div class="progress-fill${acima?' green':''}" style="width:${pct}%"></div></div>
+        <p style="font-size:10px;color:var(--text-muted);margin-top:3px">Meta: ${fmtMillions(m.metaFat)}</p>
+      </div>
+      <div style="text-align:right">
+        <p style="font-size:14px;font-weight:600;color:${acima?'var(--success-text)':'var(--text-primary)'}">${fmtMillions(m.fatPrevisto)}</p>
+        <span class="badge ${acima?'badge-green':'badge-amber'}">${acima?'Acima da meta':'Abaixo da meta'}</span>
+      </div>
+    </div>`;
   }).join('');
 }
 
 function abrirMentoradoDetalhe(i) {
   const m = mentoradosData[i];
   const s = statusInfo[m.status];
-  document.getElementById('mentorado-titulo').textContent = m.nome;
+  document.getElementById('mentorado-titulo').textContent = m.nome + ' — ' + m.lancamento;
   document.getElementById('mentorado-corpo').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <div class="avatar" style="width:44px;height:44px;font-size:15px;background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>
-      <div><p style="font-size:13px;font-weight:500">${m.lancamento}</p><span style="font-size:12px;color:var(--text-muted)">Fase: ${m.fase}</span></div>
-      <span class="badge ${s.badge}" style="margin-left:auto">${s.label}</span>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <div class="avatar" style="width:48px;height:48px;font-size:16px;min-width:48px;background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>
+      <div style="flex:1">
+        <p style="font-size:14px;font-weight:600">${m.nome}</p>
+        <p style="font-size:12px;color:var(--text-muted)">${m.email}</p>
+      </div>
+      <span class="badge ${s.badge}" style="font-size:12px;padding:4px 10px">${s.label}</span>
     </div>
-    <div class="progress-bar" style="margin-bottom:4px"><div class="progress-fill${m.progresso === 100 ? ' green' : ''}" style="width:${m.progresso}%"></div></div>
-    <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">${m.progresso}% do lançamento concluído · última atividade ${m.ultimaAtividade}</p>
-    ${m.status === 'travado' ? `<div class="info-banner" style="background:var(--danger-bg);color:var(--danger-text)">Este mentorado está sem atividade há vários dias e pode precisar de um contato direto da Orbyka.</div>` : ''}
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:var(--surface-1);border-radius:var(--radius);padding:10px;text-align:center">
+        <p style="font-size:18px;font-weight:700">${m.progresso}%</p>
+        <span style="font-size:10px;color:var(--text-muted)">progresso</span>
+      </div>
+      <div style="background:var(--surface-1);border-radius:var(--radius);padding:10px;text-align:center">
+        <p style="font-size:18px;font-weight:700">${m.leads.toLocaleString('pt-BR')}</p>
+        <span style="font-size:10px;color:var(--text-muted)">leads</span>
+      </div>
+      <div style="background:var(--surface-1);border-radius:var(--radius);padding:10px;text-align:center">
+        <p style="font-size:18px;font-weight:700">${m.tarefasFeitas}/${m.tarefasTotal}</p>
+        <span style="font-size:10px;color:var(--text-muted)">tasks</span>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px;color:var(--text-secondary)">Lançamento: <strong>${m.lancamento}</strong></span>
+        <span style="font-size:12px;color:var(--text-muted)">Fase: ${m.fase}</span>
+      </div>
+      <div class="progress-bar" style="height:8px"><div class="progress-fill${m.progresso===100?' green':''}" style="width:${m.progresso}%"></div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;background:var(--surface-1);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px">
+      <div><span style="font-size:11px;color:var(--text-muted)">Fat. projetado</span><p style="font-size:14px;font-weight:600;color:var(--accent-text)">${fmtMillions(m.fatPrevisto)}</p></div>
+      <div><span style="font-size:11px;color:var(--text-muted)">Meta</span><p style="font-size:14px;font-weight:600">${fmtMillions(m.metaFat)}</p></div>
+      <div><span style="font-size:11px;color:var(--text-muted)">Última atividade</span><p style="font-size:13px;font-weight:500">${m.ultimaAtividade}</p></div>
+    </div>
+    ${m.status === 'travado' ? `<div class="info-banner" style="background:var(--danger-bg);color:var(--danger-text);border-color:var(--danger-border)"><i class="ti ti-alert-triangle"></i> &nbsp;<strong>${m.nome}</strong> está sem acesso há <strong>${m.diasSemAcesso} dias</strong>. Recomendamos um contato direto via WhatsApp.</div>` : ''}
+    ${m.status === 'atencao' ? `<div class="info-banner"><i class="ti ti-clock"></i> &nbsp;Este mentorado acessou <strong>${m.ultimaAtividade}</strong>. Fique de olho no progresso.</div>` : ''}
   `;
+  document.getElementById('btn-contatar-mentorado').textContent = '';
+  document.getElementById('btn-contatar-mentorado').innerHTML = '<i class="ti ti-brand-whatsapp"></i> WhatsApp';
   document.getElementById('modal-mentorado').classList.add('open');
 }
 
