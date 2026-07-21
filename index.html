@@ -1035,9 +1035,13 @@
       <div class="nav-item" onclick="goAdmin('mentorados')"><i class="ti ti-users"></i> Mentorados</div>
       <div class="nav-label">Conteúdo</div>
       <div class="nav-item" onclick="goAdmin('lives')"><i class="ti ti-video"></i> Lives & mentorias</div>
+      <div class="nav-item" onclick="goAdmin('conteudo')"><i class="ti ti-book"></i> Aulas & produtos</div>
       <div class="nav-label">Análise</div>
       <div class="nav-item" onclick="goAdmin('engajamento')"><i class="ti ti-activity"></i> Engajamento</div>
       <div class="nav-item" onclick="goAdmin('financeiro')"><i class="ti ti-chart-bar"></i> Financeiro</div>
+      <div class="nav-item" onclick="goAdmin('provasocial')"><i class="ti ti-trophy"></i> Prova social</div>
+      <div class="nav-label">Configurações</div>
+      <div class="nav-item" onclick="goAdmin('acessos')"><i class="ti ti-key"></i> Membros & acessos</div>
     </div>
     <div class="admin-switch" onclick="sairModoAdmin()"><i class="ti ti-arrow-back-up"></i> Voltar ao modo Mentorado</div>
     <div class="user-area">
@@ -1212,6 +1216,118 @@
         </div>
       </div>
 
+      <!-- TELA PROVA SOCIAL -->
+      <div class="screen" id="admin-screen-provasocial">
+        <div class="row">
+          <div><p class="page-title">Prova social</p><p class="page-sub">Cases de sucesso e aprendizado da turma Rise Live — use para apresentações e vendas</p></div>
+          <button class="btn btn-primary" onclick="abrirNovoCase()"><i class="ti ti-plus"></i> Adicionar case</button>
+        </div>
+
+        <div class="info-banner" style="margin-bottom:20px"><i class="ti ti-bulb"></i> &nbsp;Os cases de <strong>sucesso</strong> mostram o potencial da metodologia. Os de <strong>aprendizado</strong> mostram honestidade e evolução — ambos vendem.</div>
+
+        <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+          <div class="section-title" style="margin-bottom:0;color:var(--success-text)"><i class="ti ti-trophy" style="font-size:15px"></i> Cases de sucesso</div>
+          <span style="font-size:11px;color:var(--text-muted)" id="ps-count-sucesso"></span>
+        </div>
+        <div id="ps-lista-sucesso" style="margin-bottom:24px"></div>
+
+        <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+          <div class="section-title" style="margin-bottom:0;color:var(--warning-text)"><i class="ti ti-school" style="font-size:15px"></i> Cases de aprendizado</div>
+          <span style="font-size:11px;color:var(--text-muted)" id="ps-count-aprendizado"></span>
+        </div>
+        <div id="ps-lista-aprendizado"></div>
+      </div>
+
+      <!-- TELA CONTEÚDO (AULAS & PRODUTOS) -->
+      <div class="screen" id="admin-screen-conteudo">
+        <div class="row">
+          <div><p class="page-title">Aulas & produtos</p><p class="page-sub">Gerencie os módulos, aulas e produtos disponíveis na área de membros</p></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" onclick="abrirNovaAula()"><i class="ti ti-plus"></i> Nova aula</button>
+            <button class="btn btn-primary" onclick="abrirNovoProduto()"><i class="ti ti-package"></i> Novo produto</button>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:16px">
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Módulos ativos</div>
+            <div class="kpi-val" id="cnt-modulos">5</div>
+            <div class="kpi-trend" style="color:var(--text-muted)">na área de estudo</div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Produtos cadastrados</div>
+            <div class="kpi-val" id="cnt-produtos">3</div>
+            <div class="kpi-trend" style="color:var(--text-muted)">disponíveis para venda</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="section-title" style="margin-bottom:0">Módulos e aulas</div>
+            <button class="btn" style="font-size:11px;padding:4px 10px" onclick="abrirNovaAula()"><i class="ti ti-plus"></i> Adicionar aula</button>
+          </div>
+          <div id="conteudo-modulos-lista"></div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="section-title" style="margin-bottom:0">Produtos / ofertas</div>
+            <button class="btn" style="font-size:11px;padding:4px 10px" onclick="abrirNovoProduto()"><i class="ti ti-plus"></i> Adicionar produto</button>
+          </div>
+          <div id="conteudo-produtos-lista"></div>
+        </div>
+      </div>
+
+      <!-- TELA MEMBROS & ACESSOS -->
+      <div class="screen" id="admin-screen-acessos">
+        <div class="row">
+          <div><p class="page-title">Membros & acessos</p><p class="page-sub">Gerencie quem tem acesso à plataforma — mentorados e convidados</p></div>
+          <button class="btn btn-primary" onclick="abrirConvidar()"><i class="ti ti-user-plus"></i> Convidar membro</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Mentorados ativos</div>
+            <div class="kpi-val" id="ac-kpi-mentorados">6</div>
+            <div class="kpi-trend" style="color:var(--success-text)"><i class="ti ti-circle-check" style="font-size:13px"></i> acesso completo</div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Convidados</div>
+            <div class="kpi-val" id="ac-kpi-convidados">3</div>
+            <div class="kpi-trend" style="color:var(--warning-text)"><i class="ti ti-clock" style="font-size:13px"></i> acesso temporário</div>
+          </div>
+          <div class="admin-kpi-card" style="background:var(--danger-bg);border-color:var(--danger-border)">
+            <div class="kpi-label" style="color:var(--danger-text)">Expiram em breve</div>
+            <div class="kpi-val" style="color:var(--danger-text)" id="ac-kpi-expirando">1</div>
+            <div class="kpi-trend" style="color:var(--danger-text)">nos próximos 7 dias</div>
+          </div>
+        </div>
+
+        <!-- TABS -->
+        <div style="display:flex;gap:8px;margin-bottom:16px" id="acessos-tabs">
+          <div class="admin-filter-btn active" onclick="mudarAbaAcessos('mentorados')">Mentorados</div>
+          <div class="admin-filter-btn" onclick="mudarAbaAcessos('convidados')">Convidados</div>
+        </div>
+
+        <div id="acessos-aba-mentorados">
+          <div class="card">
+            <table class="admin-table">
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Acesso desde</th><th>Status</th><th>Ação</th></tr></thead>
+              <tbody id="acessos-mentorados-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="acessos-aba-convidados" style="display:none">
+          <div class="card">
+            <table class="admin-table">
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Acesso</th><th>Expira em</th><th>Status</th><th>Ação</th></tr></thead>
+              <tbody id="acessos-convidados-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1242,6 +1358,133 @@
     <div class="modal-footer">
       <button class="btn" onclick="document.getElementById('modal-nova-live').classList.remove('open')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarNovaLive()"><i class="ti ti-check"></i> Adicionar mentoria</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO CASE PROVA SOCIAL -->
+<div class="modal-overlay" id="modal-novo-case" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:500px">
+    <p class="modal-title">Adicionar case</p>
+    <div class="field-row">
+      <div class="field"><label>Nome do mentorado</label><input type="text" id="nc-nome" placeholder="Ex: Marcos Ribeiro"></div>
+      <div class="field"><label>Produto / lançamento</label><input type="text" id="nc-lancamento" placeholder="Ex: Método Ribeiro"></div>
+    </div>
+    <div class="field">
+      <label>Tipo do case</label>
+      <select id="nc-tipo">
+        <option value="sucesso">Case de sucesso</option>
+        <option value="aprendizado">Case de aprendizado</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Faturamento gerado</label><input type="text" id="nc-fat" placeholder="R$ 0,00"></div>
+      <div class="field"><label>Leads captados</label><input type="number" id="nc-leads" placeholder="0"></div>
+    </div>
+    <div class="field"><label>Resultado principal (uma frase)</label><input type="text" id="nc-resultado" placeholder="Ex: Fechou R$112k em 7 dias de carrinho aberto"></div>
+    <div class="field"><label>Depoimento (opcional)</label><textarea id="nc-depoimento" rows="3" style="width:100%;padding:8px 10px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-primary);font-size:13px;font-family:var(--font);resize:vertical;outline:none" placeholder="O que o mentorado disse sobre o resultado..."></textarea></div>
+    <div class="field"><label>Aprendizado / o que mudou</label><input type="text" id="nc-aprendizado" placeholder="Ex: Ajustamos o CPM na semana 2 e o resultado dobrou"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal-novo-case').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNovoCase()"><i class="ti ti-check"></i> Salvar case</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVA AULA -->
+<div class="modal-overlay" id="modal-nova-aula" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:480px">
+    <p class="modal-title">Adicionar aula</p>
+    <div class="field-row">
+      <div class="field"><label>Módulo</label>
+        <select id="na-modulo">
+          <option>1 — Fundamentos do lançamento pago</option>
+          <option>2 — Estratégia de captação</option>
+          <option>3 — Aquecimento e pré-lançamento</option>
+          <option>4 — Abertura e gestão do carrinho</option>
+          <option>5 — Pós-venda e encerramento</option>
+          <option value="novo">+ Criar novo módulo</option>
+        </select>
+      </div>
+      <div class="field"><label>Duração</label><input type="text" id="na-duracao" placeholder="Ex: 28min"></div>
+    </div>
+    <div class="field"><label>Título da aula</label><input type="text" id="na-titulo" placeholder="Ex: Como estruturar sua oferta de ingresso"></div>
+    <div class="field"><label>Link do vídeo (Bunny.net / Mux / YouTube privado)</label><input type="text" id="na-link" placeholder="https://..."></div>
+    <div class="field"><label>Fase do lançamento relacionada</label>
+      <select id="na-fase">
+        <option>Produção</option><option>Captação</option><option>Evento / Workshop</option>
+        <option>Carrinho aberto</option><option>Fechamento</option><option>Pós-lançamento</option>
+      </select>
+    </div>
+    <div class="field" style="display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="na-bloqueada" style="width:auto">
+      <label for="na-bloqueada" style="font-size:12px;color:var(--text-secondary);margin:0">Aula bloqueada até o mentorado chegar nessa fase</label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal-nova-aula').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNovaAula()"><i class="ti ti-check"></i> Publicar aula</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO PRODUTO -->
+<div class="modal-overlay" id="modal-novo-produto" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:460px">
+    <p class="modal-title">Adicionar produto</p>
+    <div class="field"><label>Nome do produto</label><input type="text" id="np-nome" placeholder="Ex: Rise Live — Turma 3"></div>
+    <div class="field-row">
+      <div class="field"><label>Tipo</label>
+        <select id="np-tipo">
+          <option>Mentoria (acesso completo)</option>
+          <option>Produto avulso</option>
+          <option>Conteúdo extra</option>
+          <option>Acesso convidado</option>
+        </select>
+      </div>
+      <div class="field"><label>Preço</label><input type="text" id="np-preco" placeholder="R$ 0,00"></div>
+    </div>
+    <div class="field"><label>Descrição curta</label><input type="text" id="np-desc" placeholder="Ex: Acesso a todos os módulos, mentorias e templates"></div>
+    <div class="field"><label>Duração do acesso</label>
+      <select id="np-duracao">
+        <option>Vitalício</option><option>12 meses</option><option>6 meses</option><option>3 meses</option><option>30 dias</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal-novo-produto').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNovoProduto()"><i class="ti ti-check"></i> Salvar produto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONVIDAR MEMBRO -->
+<div class="modal-overlay" id="modal-convidar" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:440px">
+    <p class="modal-title">Convidar membro</p>
+    <div class="field-row">
+      <div class="field"><label>Nome completo</label><input type="text" id="cv-nome" placeholder="Nome do membro"></div>
+      <div class="field"><label>E-mail</label><input type="email" id="cv-email" placeholder="email@exemplo.com"></div>
+    </div>
+    <div class="field"><label>Tipo de acesso</label>
+      <select id="cv-tipo" onchange="toggleConvidadoExpiracao()">
+        <option value="mentorado">Mentorado (acesso completo)</option>
+        <option value="convidado">Convidado (acesso temporário)</option>
+      </select>
+    </div>
+    <div class="field" id="cv-expiracao-field" style="display:none">
+      <label>Data de expiração do acesso</label>
+      <input type="date" id="cv-expiracao">
+    </div>
+    <div class="field"><label>Produto / turma</label>
+      <select id="cv-produto">
+        <option>Rise Live — Turma atual</option>
+        <option>Acesso a conteúdo avulso</option>
+        <option>Acesso de demonstração</option>
+      </select>
+    </div>
+    <div class="success-banner" style="margin-bottom:0"><i class="ti ti-mail"></i> &nbsp;Um e-mail de boas-vindas será enviado automaticamente com o link de acesso.</div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal-convidar').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarConvite()"><i class="ti ti-send"></i> Enviar convite</button>
     </div>
   </div>
 </div>
@@ -1601,12 +1844,15 @@ function goAdmin(id) {
   document.querySelectorAll('#admin-app .nav-item').forEach(n => {
     if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) n.classList.add('active');
   });
-  const titulos = { dashboard: 'Dashboard', mentorados: 'Mentorados', lives: 'Lives & mentorias', engajamento: 'Engajamento', financeiro: 'Financeiro' };
+  const titulos = { dashboard: 'Dashboard', mentorados: 'Mentorados', lives: 'Lives & mentorias', engajamento: 'Engajamento', financeiro: 'Financeiro', provasocial: 'Prova social', conteudo: 'Aulas & produtos', acessos: 'Membros & acessos' };
   document.getElementById('admin-topbar-title').textContent = titulos[id] || id;
   if (id === 'mentorados') renderAdminMentorados('todos');
   if (id === 'lives') renderAdminLives();
   if (id === 'engajamento') renderAdminEngajamento();
   if (id === 'financeiro') renderAdminFinanceiro();
+  if (id === 'provasocial') renderProvaSocial();
+  if (id === 'conteudo') renderConteudo();
+  if (id === 'acessos') renderAcessos();
 }
 
 function fmtMillions(v) {
@@ -1971,6 +2217,225 @@ function fmtDate(d) {
   return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' });
 }
 function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+
+// ── PROVA SOCIAL ──────────────────────────────────────────────
+const casesData = [
+  { tipo:'sucesso', nome:'Marcos Ribeiro', lancamento:'Método Ribeiro', fat:'R$ 112.000', leads:3210, resultado:'Fechou R$112k em 7 dias de carrinho aberto com taxa de conversão de 3,5%', depoimento:'A metodologia do Willian mudou completamente a forma como eu olho para um lançamento. Nunca tinha tido um resultado assim.', aprendizado:'Criativos em vídeo performaram 2x melhor que imagem estática. Ajustamos na semana 2 e o resultado dobrou.', iniciais:'MR', cor:'var(--success-bg)', corT:'var(--success-text)' },
+  { tipo:'sucesso', nome:'Juliana Prado', lancamento:'Prado Lançamentos', fat:'R$ 98.000', leads:4100, resultado:'Bateu a meta em 4 dias de carrinho aberto e encerrou com 20% acima', depoimento:'Pela primeira vez eu entendi de onde vieram cada uma das minhas vendas. O CAMP me deu visibilidade total.', aprendizado:'Público de base (lista) converteu 4x mais que tráfego frio. Foco na nutrição da lista agora é prioridade.', iniciais:'JP', cor:'var(--surface-1)', corT:'var(--text-muted)' },
+  { tipo:'aprendizado', nome:'Fernanda Silva', lancamento:'Aquecimento Rise', fat:'R$ 41.000', leads:1540, resultado:'Ficou 31% abaixo da meta mas dobrou o faturamento em relação ao lançamento anterior', depoimento:'Não bati a meta, mas aprendi mais nesse lançamento do que em todos os outros juntos. O próximo vai ser diferente.', aprendizado:'CTR baixo na fase de captação indicou problema no criativo. Corrigir isso antes da abertura do carrinho é essencial.', iniciais:'FS', cor:'var(--warning-bg)', corT:'var(--warning-text)' },
+  { tipo:'aprendizado', nome:'Rodrigo Alves', lancamento:'Lançamento Alves', fat:'R$ 12.000', leads:312, resultado:'Captação insuficiente comprometeu o resultado final — 15% da meta atingida', depoimento:'Foi difícil, mas entendi onde errei. A fase de produção precisa de mais tempo e não dá para improvisar.', aprendizado:'Prazo de produção muito curto não permitiu criar criativos de qualidade. Próximo lançamento começa 60 dias antes.', iniciais:'RA', cor:'#ede9fe', corT:'#7c3aed' },
+];
+
+function renderProvaSocial() {
+  const sucesso = casesData.filter(c => c.tipo === 'sucesso');
+  const aprendizado = casesData.filter(c => c.tipo === 'aprendizado');
+  document.getElementById('ps-count-sucesso').textContent = sucesso.length + ' cases';
+  document.getElementById('ps-count-aprendizado').textContent = aprendizado.length + ' cases';
+  document.getElementById('ps-lista-sucesso').innerHTML = sucesso.map((c,i) => renderCaseCard(c, casesData.indexOf(c), '#22c55e', 'badge-green')).join('');
+  document.getElementById('ps-lista-aprendizado').innerHTML = aprendizado.map((c,i) => renderCaseCard(c, casesData.indexOf(c), '#f59e0b', 'badge-amber')).join('');
+}
+
+function renderCaseCard(c, idx, accentColor, badgeClass) {
+  return `<div class="card" style="margin-bottom:10px;border-left:3px solid ${accentColor}">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div class="avatar" style="width:42px;height:42px;font-size:14px;min-width:42px;background:${c.cor};color:${c.corT}">${c.iniciais}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <p style="font-size:14px;font-weight:600">${c.nome}</p>
+          <span style="font-size:11px;color:var(--text-muted)">· ${c.lancamento}</span>
+          <span class="badge ${badgeClass}" style="margin-left:auto">${c.tipo === 'sucesso' ? 'Sucesso' : 'Aprendizado'}</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-primary);margin-bottom:10px">${c.resultado}</p>
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <div style="background:var(--surface-1);border-radius:var(--radius);padding:8px 12px;text-align:center;min-width:80px">
+            <p style="font-size:15px;font-weight:700;color:${accentColor}">${c.fat}</p>
+            <span style="font-size:10px;color:var(--text-muted)">faturamento</span>
+          </div>
+          <div style="background:var(--surface-1);border-radius:var(--radius);padding:8px 12px;text-align:center;min-width:80px">
+            <p style="font-size:15px;font-weight:700">${c.leads.toLocaleString('pt-BR')}</p>
+            <span style="font-size:10px;color:var(--text-muted)">leads</span>
+          </div>
+        </div>
+        ${c.depoimento ? `<div style="background:var(--surface-1);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;border-left:2px solid ${accentColor}">
+          <p style="font-size:12px;color:var(--text-secondary);font-style:italic">"${c.depoimento}"</p>
+        </div>` : ''}
+        <div style="display:flex;align-items:flex-start;gap:6px">
+          <i class="ti ti-bulb" style="font-size:13px;color:var(--accent-text);margin-top:1px"></i>
+          <p style="font-size:12px;color:var(--text-secondary)">${c.aprendizado}</p>
+        </div>
+      </div>
+      <button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:14px;padding:4px" onclick="removerCase(${idx})" title="Remover case"><i class="ti ti-trash"></i></button>
+    </div>
+  </div>`;
+}
+
+function abrirNovoCase() { document.getElementById('modal-novo-case').classList.add('open'); }
+function removerCase(idx) {
+  if (confirm('Remover este case?')) { casesData.splice(idx, 1); renderProvaSocial(); }
+}
+function salvarNovoCase() {
+  const nome = document.getElementById('nc-nome').value.trim();
+  const lancamento = document.getElementById('nc-lancamento').value.trim();
+  if (!nome) { alert('Informe o nome do mentorado.'); return; }
+  casesData.push({
+    tipo: document.getElementById('nc-tipo').value,
+    nome, lancamento,
+    fat: document.getElementById('nc-fat').value || '—',
+    leads: parseInt(document.getElementById('nc-leads').value) || 0,
+    resultado: document.getElementById('nc-resultado').value || '',
+    depoimento: document.getElementById('nc-depoimento').value || '',
+    aprendizado: document.getElementById('nc-aprendizado').value || '',
+    iniciais: nome.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase(),
+    cor: 'var(--accent-bg)', corT: 'var(--accent-text)'
+  });
+  document.getElementById('modal-novo-case').classList.remove('open');
+  renderProvaSocial();
+  showToast('Case adicionado com sucesso');
+}
+
+// ── CONTEÚDO (AULAS & PRODUTOS) ───────────────────────────────
+const modulosData = [
+  { num:1, titulo:'Fundamentos do lançamento pago', aulas:8, duracao:'2h30', status:'publicado', fase:'Produção' },
+  { num:2, titulo:'Estratégia de captação', aulas:12, duracao:'4h15', status:'publicado', fase:'Captação' },
+  { num:3, titulo:'Aquecimento e pré-lançamento', aulas:10, duracao:'3h40', status:'publicado', fase:'Evento' },
+  { num:4, titulo:'Abertura e gestão do carrinho', aulas:9, duracao:'3h10', status:'rascunho', fase:'Carrinho aberto' },
+  { num:5, titulo:'Pós-venda e encerramento', aulas:6, duracao:'2h00', status:'rascunho', fase:'Pós-lançamento' },
+];
+const produtosData = [
+  { nome:'Rise Live — Turma atual', tipo:'Mentoria', preco:'R$ 9.997', duracao:'12 meses', membros:6, status:'ativo' },
+  { nome:'Templates & Scripts Rise', tipo:'Produto avulso', preco:'R$ 497', duracao:'Vitalício', membros:14, status:'ativo' },
+  { nome:'Acesso demonstração', tipo:'Convidado', preco:'Gratuito', duracao:'7 dias', membros:3, status:'ativo' },
+];
+
+function renderConteudo() {
+  document.getElementById('cnt-modulos').textContent = modulosData.length;
+  document.getElementById('cnt-produtos').textContent = produtosData.length;
+  document.getElementById('conteudo-modulos-lista').innerHTML = modulosData.map((m,i) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border)">
+      <div class="module-num" style="${m.status==='rascunho'?'background:var(--surface-1);color:var(--text-muted)':''}">${m.num}</div>
+      <div style="flex:1">
+        <p style="font-size:13px;font-weight:500">${m.titulo}</p>
+        <span style="font-size:11px;color:var(--text-muted)">${m.aulas} aulas · ${m.duracao} · Fase: ${m.fase}</span>
+      </div>
+      <span class="badge ${m.status==='publicado'?'badge-green':'badge-gray'}">${m.status==='publicado'?'Publicado':'Rascunho'}</span>
+      <button class="btn" style="font-size:11px;padding:4px 10px" onclick="toggleModuloStatus(${i})">${m.status==='publicado'?'Ocultar':'Publicar'}</button>
+    </div>`).join('');
+  document.getElementById('conteudo-produtos-lista').innerHTML = produtosData.map((p,i) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border)">
+      <div style="width:36px;height:36px;background:var(--accent-bg);border-radius:var(--radius);display:flex;align-items:center;justify-content:center"><i class="ti ti-package" style="font-size:16px;color:var(--accent-text)"></i></div>
+      <div style="flex:1">
+        <p style="font-size:13px;font-weight:500">${p.nome}</p>
+        <span style="font-size:11px;color:var(--text-muted)">${p.tipo} · ${p.preco} · ${p.duracao} · ${p.membros} membros</span>
+      </div>
+      <span class="badge badge-green">Ativo</span>
+      <button class="btn" style="font-size:11px;padding:4px 10px;color:var(--danger-text);border-color:var(--danger-border)" onclick="removerProduto(${i})"><i class="ti ti-trash"></i></button>
+    </div>`).join('');
+}
+
+function toggleModuloStatus(i) {
+  modulosData[i].status = modulosData[i].status === 'publicado' ? 'rascunho' : 'publicado';
+  renderConteudo();
+}
+function removerProduto(i) {
+  if (confirm('Remover este produto?')) { produtosData.splice(i,1); renderConteudo(); }
+}
+function abrirNovaAula() { document.getElementById('modal-nova-aula').classList.add('open'); }
+function abrirNovoProduto() { document.getElementById('modal-novo-produto').classList.add('open'); }
+function salvarNovaAula() {
+  const titulo = document.getElementById('na-titulo').value.trim();
+  if (!titulo) { alert('Informe o título da aula.'); return; }
+  const moduloIdx = document.getElementById('na-modulo').selectedIndex;
+  if (moduloIdx < modulosData.length) modulosData[moduloIdx].aulas++;
+  document.getElementById('modal-nova-aula').classList.remove('open');
+  renderConteudo();
+  showToast('Aula publicada com sucesso');
+}
+function salvarNovoProduto() {
+  const nome = document.getElementById('np-nome').value.trim();
+  if (!nome) { alert('Informe o nome do produto.'); return; }
+  produtosData.push({
+    nome, tipo: document.getElementById('np-tipo').value,
+    preco: document.getElementById('np-preco').value || '—',
+    duracao: document.getElementById('np-duracao').value,
+    membros: 0, status: 'ativo'
+  });
+  document.getElementById('modal-novo-produto').classList.remove('open');
+  renderConteudo();
+  showToast('Produto adicionado com sucesso');
+}
+
+// ── MEMBROS & ACESSOS ─────────────────────────────────────────
+const convidadosData = [
+  { nome:'Beatriz Ramos', email:'beatriz@email.com', acesso:'15 jun 2026', expira:'22 jul 2026', diasRestantes:1, produto:'Acesso demonstração', status:'expirando' },
+  { nome:'Felipe Nogueira', email:'felipe@email.com', acesso:'01 jul 2026', expira:'01 ago 2026', diasRestantes:11, produto:'Templates & Scripts Rise', status:'ativo' },
+  { nome:'Carla Mendes', email:'carla@email.com', acesso:'10 jul 2026', expira:'10 ago 2026', diasRestantes:20, produto:'Acesso demonstração', status:'ativo' },
+];
+
+function renderAcessos() {
+  document.getElementById('acessos-mentorados-tbody').innerHTML = mentoradosData.map((m,i) => `
+    <tr>
+      <td><div class="admin-mentorado-cell"><div class="avatar" style="background:${m.cor};color:${m.corTexto}">${m.iniciais}</div>${m.nome}</div></td>
+      <td style="font-size:12px;color:var(--text-muted)">${m.email}</td>
+      <td style="font-size:12px;color:var(--text-muted)">Rise Live · Turma atual</td>
+      <td><span class="badge badge-green">Ativo</span></td>
+      <td><button class="btn" style="font-size:11px;padding:4px 8px;color:var(--danger-text);border-color:var(--danger-border)">Revogar</button></td>
+    </tr>`).join('');
+  document.getElementById('acessos-convidados-tbody').innerHTML = convidadosData.map((c,i) => `
+    <tr>
+      <td style="font-size:13px;font-weight:500">${c.nome}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${c.email}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${c.produto}</td>
+      <td style="font-size:12px"><span style="color:${c.status==='expirando'?'var(--danger-text)':'var(--text-secondary)'};font-weight:${c.status==='expirando'?600:400}">${c.expira}${c.status==='expirando'?' ⚠️':''}</span></td>
+      <td><span class="badge ${c.status==='expirando'?'badge-red':'badge-green'}">${c.status==='expirando'?'Expirando':'Ativo'}</span></td>
+      <td style="display:flex;gap:4px">
+        <button class="btn" style="font-size:11px;padding:4px 8px" onclick="renovarConvidado(${i})">Renovar</button>
+        <button class="btn" style="font-size:11px;padding:4px 8px;color:var(--danger-text);border-color:var(--danger-border)" onclick="revogarConvidado(${i})">Revogar</button>
+      </td>
+    </tr>`).join('');
+}
+
+function mudarAbaAcessos(aba) {
+  document.getElementById('acessos-aba-mentorados').style.display = aba === 'mentorados' ? '' : 'none';
+  document.getElementById('acessos-aba-convidados').style.display = aba === 'convidados' ? '' : 'none';
+  document.querySelectorAll('#acessos-tabs .admin-filter-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(aba));
+  });
+}
+function renovarConvidado(i) {
+  const d = new Date(); d.setDate(d.getDate()+30);
+  convidadosData[i].expira = d.toLocaleDateString('pt-BR'); convidadosData[i].status = 'ativo'; convidadosData[i].diasRestantes = 30;
+  renderAcessos(); showToast('Acesso renovado por 30 dias');
+}
+function revogarConvidado(i) {
+  if (confirm('Revogar acesso de ' + convidadosData[i].nome + '?')) { convidadosData.splice(i,1); renderAcessos(); }
+}
+function abrirConvidar() { document.getElementById('modal-convidar').classList.add('open'); }
+function toggleConvidadoExpiracao() {
+  const tipo = document.getElementById('cv-tipo').value;
+  document.getElementById('cv-expiracao-field').style.display = tipo === 'convidado' ? '' : 'none';
+}
+function salvarConvite() {
+  const nome = document.getElementById('cv-nome').value.trim();
+  const email = document.getElementById('cv-email').value.trim();
+  if (!nome || !email) { alert('Preencha nome e e-mail.'); return; }
+  const tipo = document.getElementById('cv-tipo').value;
+  if (tipo === 'convidado') {
+    const expira = document.getElementById('cv-expiracao').value;
+    convidadosData.push({ nome, email, acesso: new Date().toLocaleDateString('pt-BR'), expira: expira ? new Date(expira+'T12:00:00').toLocaleDateString('pt-BR') : '—', diasRestantes: 30, produto: document.getElementById('cv-produto').value, status: 'ativo' });
+  } else {
+    mentoradosData.push({ nome, email, iniciais: nome.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase(), cor:'var(--accent-bg)', corTexto:'var(--accent-text)', lancamento:'—', fase:'Produção', progresso:0, status:'em_dia', ultimaAtividade:'agora', diasSemAcesso:0, leads:0, fatPrevisto:0, metaFat:0, tarefasFeitas:0, tarefasTotal:47 });
+  }
+  document.getElementById('modal-convidar').classList.remove('open');
+  renderAcessos();
+  showToast('Convite enviado para ' + email);
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#15803d;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;animation:fadein 0.2s ease';
+  document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
+}
 
 function calcDates() {
   const vP = document.getElementById('d-producao').value;
