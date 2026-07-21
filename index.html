@@ -1042,6 +1042,7 @@
       <div class="nav-item" onclick="goAdmin('provasocial')"><i class="ti ti-trophy"></i> Prova social</div>
       <div class="nav-label">Configurações</div>
       <div class="nav-item" onclick="goAdmin('acessos')"><i class="ti ti-key"></i> Membros & acessos</div>
+      <div class="nav-item" onclick="goAdmin('convidados')"><i class="ti ti-user-share"></i> Convidados</div>
     </div>
     <div class="admin-switch" onclick="sairModoAdmin()"><i class="ti ti-arrow-back-up"></i> Voltar ao modo Mentorado</div>
     <div class="user-area">
@@ -1278,6 +1279,34 @@
         </div>
       </div>
 
+      <!-- TELA CONVIDADOS -->
+      <div class="screen" id="admin-screen-convidados">
+        <div class="row">
+          <div><p class="page-title">Convidados</p><p class="page-sub">Acessos temporários — parceiros, leads VIP e demonstrações</p></div>
+          <button class="btn btn-primary" onclick="abrirConvidarGuest()"><i class="ti ti-user-plus"></i> Novo convidado</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Convidados ativos</div>
+            <div class="kpi-val" id="g-kpi-ativos">—</div>
+            <div class="kpi-trend" style="color:var(--text-muted)">com acesso ativo</div>
+          </div>
+          <div class="admin-kpi-card" style="background:var(--danger-bg);border-color:var(--danger-border)">
+            <div class="kpi-label" style="color:var(--danger-text)">Expirando em breve</div>
+            <div class="kpi-val" style="color:var(--danger-text)" id="g-kpi-expirando">—</div>
+            <div class="kpi-trend" style="color:var(--danger-text)">nos próximos 7 dias</div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="kpi-label">Total enviados</div>
+            <div class="kpi-val" id="g-kpi-total">—</div>
+            <div class="kpi-trend" style="color:var(--text-muted)">todos os convites</div>
+          </div>
+        </div>
+        <div class="card">
+          <div id="convidados-lista"></div>
+        </div>
+      </div>
+
       <!-- TELA MEMBROS & ACESSOS -->
       <div class="screen" id="admin-screen-acessos">
         <div class="row">
@@ -1485,6 +1514,32 @@
     <div class="modal-footer">
       <button class="btn" onclick="document.getElementById('modal-convidar').classList.remove('open')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarConvite()"><i class="ti ti-send"></i> Enviar convite</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO CONVIDADO -->
+<div class="modal-overlay" id="modal-convidar-guest" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:440px">
+    <p class="modal-title">Novo convidado</p>
+    <div class="field-row">
+      <div class="field"><label>Nome completo</label><input type="text" id="g-nome" placeholder="Nome do convidado"></div>
+      <div class="field"><label>E-mail</label><input type="email" id="g-email" placeholder="email@exemplo.com"></div>
+    </div>
+    <div class="field"><label>Produto / acesso</label>
+      <select id="g-produto">
+        <option>Acesso demonstração</option>
+        <option>Templates & Scripts Rise</option>
+        <option>Rise Live — Turma atual</option>
+        <option>Acesso de parceiro</option>
+      </select>
+    </div>
+    <div class="field"><label>Data de expiração</label><input type="date" id="g-expiracao"></div>
+    <div class="field"><label>Observação (opcional)</label><input type="text" id="g-obs" placeholder="Ex: Lead VIP, parceiro da Orbyka..."></div>
+    <div class="success-banner" style="margin-bottom:0"><i class="ti ti-mail"></i> &nbsp;Um e-mail de boas-vindas com o link de acesso será enviado automaticamente.</div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('modal-convidar-guest').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarConvidadoGuest()"><i class="ti ti-send"></i> Enviar convite</button>
     </div>
   </div>
 </div>
@@ -1844,7 +1899,7 @@ function goAdmin(id) {
   document.querySelectorAll('#admin-app .nav-item').forEach(n => {
     if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) n.classList.add('active');
   });
-  const titulos = { dashboard: 'Dashboard', mentorados: 'Mentorados', lives: 'Lives & mentorias', engajamento: 'Engajamento', financeiro: 'Financeiro', provasocial: 'Prova social', conteudo: 'Aulas & produtos', acessos: 'Membros & acessos' };
+  const titulos = { dashboard: 'Dashboard', mentorados: 'Mentorados', lives: 'Lives & mentorias', engajamento: 'Engajamento', financeiro: 'Financeiro', provasocial: 'Prova social', conteudo: 'Aulas & produtos', acessos: 'Membros & acessos', convidados: 'Convidados' };
   document.getElementById('admin-topbar-title').textContent = titulos[id] || id;
   if (id === 'mentorados') renderAdminMentorados('todos');
   if (id === 'lives') renderAdminLives();
@@ -1853,6 +1908,7 @@ function goAdmin(id) {
   if (id === 'provasocial') renderProvaSocial();
   if (id === 'conteudo') renderConteudo();
   if (id === 'acessos') renderAcessos();
+  if (id === 'convidados') renderConvidados();
 }
 
 function fmtMillions(v) {
@@ -2428,6 +2484,63 @@ function salvarConvite() {
   document.getElementById('modal-convidar').classList.remove('open');
   renderAcessos();
   showToast('Convite enviado para ' + email);
+}
+
+function renderConvidados() {
+  const ativos = convidadosData.filter(c => c.status === 'ativo').length;
+  const expirando = convidadosData.filter(c => c.status === 'expirando').length;
+  document.getElementById('g-kpi-ativos').textContent = ativos;
+  document.getElementById('g-kpi-expirando').textContent = expirando;
+  document.getElementById('g-kpi-total').textContent = convidadosData.length;
+
+  document.getElementById('convidados-lista').innerHTML = convidadosData.length ? `
+    <table class="admin-table">
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Produto</th><th>Acesso desde</th><th>Expira em</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody>${convidadosData.map((c,i) => `
+        <tr>
+          <td style="font-weight:500">${c.nome}</td>
+          <td style="color:var(--text-muted);font-size:12px">${c.email}</td>
+          <td style="font-size:12px">${c.produto}</td>
+          <td style="font-size:12px;color:var(--text-muted)">${c.acesso}</td>
+          <td><span style="font-size:12px;font-weight:${c.status==='expirando'?600:400};color:${c.status==='expirando'?'var(--danger-text)':'var(--text-secondary)'}">${c.expira}${c.status==='expirando'?' ⚠️':''}</span></td>
+          <td><span class="badge ${c.status==='expirando'?'badge-red':'badge-green'}">${c.status==='expirando'?'Expirando':'Ativo'}</span></td>
+          <td><div style="display:flex;gap:4px">
+            <button class="btn" style="font-size:11px;padding:4px 8px" onclick="renovarConvidado(${i})"><i class="ti ti-refresh"></i> Renovar</button>
+            <button class="btn" style="font-size:11px;padding:4px 8px;color:var(--danger-text);border-color:var(--danger-border)" onclick="revogarConvidadoG(${i})"><i class="ti ti-x"></i></button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<p style="font-size:13px;color:var(--text-muted);padding:20px 0;text-align:center">Nenhum convidado cadastrado.</p>';
+}
+
+function abrirConvidarGuest() { document.getElementById('modal-convidar-guest').classList.add('open'); }
+function salvarConvidadoGuest() {
+  const nome = document.getElementById('g-nome').value.trim();
+  const email = document.getElementById('g-email').value.trim();
+  if (!nome || !email) { alert('Preencha nome e e-mail.'); return; }
+  const expira = document.getElementById('g-expiracao').value;
+  const expiraFmt = expira ? new Date(expira+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+  const hoje = new Date();
+  const diasRestantes = expira ? Math.ceil((new Date(expira+'T12:00:00') - hoje) / 86400000) : 30;
+  convidadosData.push({
+    nome, email,
+    produto: document.getElementById('g-produto').value,
+    acesso: hoje.toLocaleDateString('pt-BR'),
+    expira: expiraFmt,
+    diasRestantes,
+    status: diasRestantes <= 7 ? 'expirando' : 'ativo'
+  });
+  document.getElementById('modal-convidar-guest').classList.remove('open');
+  ['g-nome','g-email','g-expiracao','g-obs'].forEach(id => document.getElementById(id).value = '');
+  renderConvidados();
+  showToast('Convite enviado para ' + email);
+}
+
+function revogarConvidadoG(i) {
+  if (confirm('Revogar acesso de ' + convidadosData[i].nome + '?')) {
+    convidadosData.splice(i, 1);
+    renderConvidados();
+  }
 }
 
 function showToast(msg) {
